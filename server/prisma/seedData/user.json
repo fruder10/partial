@@ -1,0 +1,202 @@
+[
+  {
+    "cognitoId": "cog-1001",
+    "username": "jdoe",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "phoneNumber": "15551234567",
+    "role": "Design Engineer",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 1
+  },
+  {
+    "cognitoId": "cog-1002",
+    "username": "asmith",
+    "name": "Alice Smith",
+    "email": "alice.smith@example.com",
+    "phoneNumber": "15551234568",
+    "role": "Design Engineer",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 1
+  },
+  {
+    "cognitoId": "cog-1003",
+    "username": "bwong",
+    "name": "Ben Wong",
+    "email": "ben.wong@example.com",
+    "phoneNumber": "15551234569",
+    "role": "Electrical Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 2
+  },
+  {
+    "cognitoId": "cog-1004",
+    "username": "cchen",
+    "name": "Cindy Chen",
+    "email": "cindy.chen@example.com",
+    "phoneNumber": "15551234570",
+    "role": "Program Manager",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 3
+  },
+  {
+    "cognitoId": "cog-1005",
+    "username": "dmiller",
+    "name": "David Miller",
+    "email": "david.miller@example.com",
+    "phoneNumber": "15551234571",
+    "role": "Mechanical Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 2
+  },
+  {
+    "cognitoId": "cog-1006",
+    "username": "esanchez",
+    "name": "Elena Sanchez",
+    "email": "elena.sanchez@example.com",
+    "phoneNumber": "15551234572",
+    "role": "Project Manager",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 3
+  },
+  {
+    "cognitoId": "cog-1007",
+    "username": "flee",
+    "name": "Frank Lee",
+    "email": "frank.lee@example.com",
+    "phoneNumber": "15551234573",
+    "role": "Test Engineer",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 4
+  },
+  {
+    "cognitoId": "cog-1008",
+    "username": "gpatel",
+    "name": "Grace Patel",
+    "email": "grace.patel@example.com",
+    "phoneNumber": "15551234574",
+    "role": "Manufacturing Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 4
+  },
+  {
+    "cognitoId": "cog-1009",
+    "username": "hmurphy",
+    "name": "Hannah Murphy",
+    "email": "hannah.murphy@example.com",
+    "phoneNumber": "15551234575",
+    "role": "Quality Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 3
+  },
+  {
+    "cognitoId": "cog-1010",
+    "username": "irios",
+    "name": "Ivan Rios",
+    "email": "ivan.rios@example.com",
+    "phoneNumber": "15551234576",
+    "role": "Supply Chain Mgr",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 2
+  },
+  {
+    "cognitoId": "cog-1011",
+    "username": "jnguyen",
+    "name": "Jenny Nguyen",
+    "email": "jenny.nguyen@example.com",
+    "phoneNumber": "15551234577",
+    "role": "Optical Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 2
+  },
+  {
+    "cognitoId": "cog-1012",
+    "username": "kroberts",
+    "name": "Kevin Roberts",
+    "email": "kevin.roberts@example.com",
+    "phoneNumber": "15551234578",
+    "role": "Optical Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 2
+  },
+  {
+    "cognitoId": "cog-1013",
+    "username": "lmartinez",
+    "name": "Laura Martinez",
+    "email": "laura.martinez@example.com",
+    "phoneNumber": "15551234579",
+    "role": "Electrical Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 2
+  },
+  {
+    "cognitoId": "cog-1014",
+    "username": "mjohnson",
+    "name": "Mark Johnson",
+    "email": "mark.johnson@example.com",
+    "phoneNumber": "15551234580",
+    "role": "Mechanisms Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 4
+  },
+  {
+    "cognitoId": "cog-1015",
+    "username": "nlee",
+    "name": "Naomi Lee",
+    "email": "naomi.lee@example.com",
+    "phoneNumber": "15551234581",
+    "role": "Structural Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 3
+  },
+  {
+    "cognitoId": "cog-1016",
+    "username": "opatel",
+    "name": "Omar Patel",
+    "email": "omar.patel@example.com",
+    "phoneNumber": "15551234582",
+    "role": "Mechanical Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 1
+  },
+  {
+    "cognitoId": "cog-1017",
+    "username": "pkim",
+    "name": "Paul Kim",
+    "email": "paul.kim@example.com",
+    "phoneNumber": "15551234583",
+    "role": "Electrical Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 2
+  },
+  {
+    "cognitoId": "cog-1018",
+    "username": "qgomez",
+    "name": "Quinn Gomez",
+    "email": "quinn.gomez@example.com",
+    "phoneNumber": "15551234584",
+    "role": "Mechanisms Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 4
+  },
+  {
+    "cognitoId": "cog-1019",
+    "username": "rwhite",
+    "name": "Rachel White",
+    "email": "rachel.white@example.com",
+    "phoneNumber": "15551234585",
+    "role": "Structural Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 3
+  },
+  {
+    "cognitoId": "cog-1020",
+    "username": "sjackson",
+    "name": "Sam Jackson",
+    "email": "sam.jackson@example.com",
+    "phoneNumber": "15551234586",
+    "role": "Mechanisms Eng",
+    "profilePictureUrl": null,
+    "disciplineTeamId": 4
+  }
+]

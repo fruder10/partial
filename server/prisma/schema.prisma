@@ -1,0 +1,259 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===================
+// Enums
+// ===================
+
+enum Priority {
+  Urgent
+  High
+  Medium
+  Low
+  Backlog
+}
+
+enum Status {
+  ToDo
+  WorkInProgress
+  UnderReview
+  Completed
+}
+
+enum DeliverableType {
+  SystemSubsystemRequirementsSpecificationSRS
+  InterfaceControlDocumentICD
+  PreliminaryDesignReviewPDRPackage
+  RiskFailureModeEffectsAnalysisFMEADFMEAReport
+  DevelopmentVerificationPlanVVMatrix
+  EngineeringDrawingCADModel
+  BillofMaterialsBOM
+  StressStructuralAnalysisReport
+  ThermalAnalysisReport
+  ElectricalSchematicsPCBLayouts
+  DesignforManufacturabilityDFMDesignforTestDFTReviewReport
+  CriticalDesignReviewCDRPackage
+  WorkInstructionsAssemblyProcedures
+  FirstArticleInspectionFAIReport
+  SupplierQualityRecordsCertificatesofConformanceCoC
+  TestPlansandProcedures
+  QualificationTestReport
+  AcceptanceTestProcedureATPReport
+  CalibrationCertificates
+  NonConformanceCorrectiveActionReportNCRCAR
+  RequirementsVerificationReport
+  AsBuiltConfigurationEndItemDataPackage
+  UserOperationsManual
+  MaintenanceRepairManualSparePartsList
+  CertificatesofCompliance
+  LessonsLearnedPostProjectReport
+  Other
+}
+
+enum IssueType {
+  Defect
+  Failure
+  RequirementWaiver
+  NonConformanceReportNCR
+  ProcessManufacturingIssue
+  SupplyChainProcurementIssue
+  IntegrationInterfaceIssue
+  TestVerificationAnomaly
+  EnvironmentalReliabilityIssue
+  ConfigurationDocumentationControlIssue
+  SafetyRegulatoryIssue
+  ProgrammaticRiskItem
+  ObsolescenceEndOfLifeIssue
+  Other
+}
+
+enum WorkItemType {
+  Task
+  Deliverable
+  Issue
+}
+
+// ===================
+// Core Models
+// ===================
+
+model User {
+  userId            Int     @id @default(autoincrement())
+  cognitoId         String  @unique
+  username          String  @unique
+  name              String
+  email             String  @unique
+  phoneNumber       String
+  role              String
+  profilePictureUrl String?
+  disciplineTeamId  Int?
+
+  disciplineTeam DisciplineTeam? @relation(fields: [disciplineTeamId], references: [id])
+
+  authoredWorkItems WorkItem[] @relation("WorkItemAuthor")
+  assignedWorkItems WorkItem[] @relation("WorkItemAssignee")
+
+  partNumbers PartNumber[]
+  attachments Attachment[]
+  comments    Comment[]
+}
+
+model DisciplineTeam {
+  id                Int    @id @default(autoincrement())
+  name              String
+  description       String
+  teamManagerUserId Int?
+
+  users    User[]
+  programs DisciplineTeamToProgram[]
+}
+
+model Program {
+  id                   Int      @id @default(autoincrement())
+  name                 String
+  description          String
+  programManagerUserId Int?
+  startDate            DateTime
+  endDate              DateTime
+
+  partNumbers     PartNumber[]
+  disciplineTeams DisciplineTeamToProgram[]
+  milestones      Milestone[]
+  workItems       WorkItem[]
+}
+
+model DisciplineTeamToProgram {
+  id               Int @id @default(autoincrement())
+  disciplineTeamId Int
+  programId        Int
+
+  disciplineTeam DisciplineTeam @relation(fields: [disciplineTeamId], references: [id])
+  program        Program        @relation(fields: [programId], references: [id])
+}
+
+model Milestone {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  date        DateTime
+  programId   Int
+
+  program   Program    @relation(fields: [programId], references: [id])
+  workItems WorkItem[]
+}
+
+model PartNumber {
+  id             Int    @id @default(autoincrement())
+  number         Int    @unique
+  partName       String
+  level          Int
+  state          String
+  revisionLevel  String
+  assignedUserId Int
+  programId      Int
+  parentId       Int?
+
+  assignedUser User         @relation(fields: [assignedUserId], references: [userId])
+  program      Program      @relation(fields: [programId], references: [id])
+  parent       PartNumber?  @relation("ParentChildren", fields: [parentId], references: [id])
+  children     PartNumber[] @relation("ParentChildren")
+
+  workItemLinks WorkItemToPartNumber[]
+}
+
+// ===================
+// Base WorkItem + Subtypes
+// ===================
+
+model WorkItem {
+  id                      Int          @id @default(autoincrement())
+  workItemType            WorkItemType
+  title                   String
+  description             String
+  status                  Status
+  priority                Priority
+  tags                    String?
+  dateOpened              DateTime     @default(now())
+  dueDate                 DateTime
+  estimatedCompletionDate DateTime
+  actualCompletionDate    DateTime?
+  percentComplete         Int
+  inputStatus             String
+  programId               Int
+  dueByMilestoneId        Int
+  authorUserId            Int
+  assignedUserId          Int
+
+  program        Program   @relation(fields: [programId], references: [id])
+  dueByMilestone Milestone @relation(fields: [dueByMilestoneId], references: [id])
+  authorUser     User      @relation("WorkItemAuthor", fields: [authorUserId], references: [userId])
+  assigneeUser   User      @relation("WorkItemAssignee", fields: [assignedUserId], references: [userId])
+
+  // Relations
+  partNumbers WorkItemToPartNumber[]
+  attachments Attachment[]
+  comments    Comment[]
+
+  // Subtype details
+  issueDetail       IssueDetail?
+  deliverableDetail DeliverableDetail?
+}
+
+model IssueDetail {
+  id               Int       @id
+  issueType        IssueType
+  rootCause        String?
+  correctiveAction String?
+
+  workItem WorkItem @relation(fields: [id], references: [id])
+}
+
+model DeliverableDetail {
+  id              Int             @id
+  deliverableType DeliverableType
+
+  workItem WorkItem @relation(fields: [id], references: [id])
+}
+
+// ===================
+// Linking Models
+// ===================
+
+model WorkItemToPartNumber {
+  id           Int @id @default(autoincrement())
+  workItemId   Int
+  partNumberId Int
+
+  workItem   WorkItem   @relation(fields: [workItemId], references: [id])
+  partNumber PartNumber @relation(fields: [partNumberId], references: [id])
+}
+
+model Attachment {
+  id               Int      @id @default(autoincrement())
+  fileUrl          String
+  fileName         String
+  dateAttached     DateTime @default(now())
+  uploadedByUserId Int
+  workItemId       Int?
+
+  uploadedByUser User      @relation(fields: [uploadedByUserId], references: [userId])
+  workItem       WorkItem? @relation(fields: [workItemId], references: [id])
+}
+
+model Comment {
+  id              Int      @id @default(autoincrement())
+  text            String
+  dateCommented   DateTime @default(now())
+  commenterUserId Int
+  workItemId      Int?
+
+  commenterUser User      @relation(fields: [commenterUserId], references: [userId])
+  workItem      WorkItem? @relation(fields: [workItemId], references: [id])
+}

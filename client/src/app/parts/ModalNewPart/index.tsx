@@ -1,0 +1,149 @@
+import Modal from '@/components/Modal';
+import { useCreatePartMutation } from '@/state/api';
+import React, { useState } from 'react';
+//import { formatISO } from 'date-fns';
+
+type Props = {
+    isOpen: boolean;
+    onClose: () => void;
+};
+
+const ModalNewPart = ({isOpen, onClose}: Props) => {
+    const [createPart, {isLoading}] = useCreatePartMutation();
+    const [partNumber, setPartNumber] = useState("");
+    const [partName, setPartName] = useState("");
+    const [level, setLevel] = useState("");
+    const [state, setState] = useState("");
+    const [revisionLevel, setRevisionLevel] = useState("");
+    const [assignedUserId, setAssignedUserId] = useState("");
+    const [programId, setProgramId] = useState("");
+    const [parentId, setParentId] = useState("");
+    //const [startDate, setStartDate] = useState("");
+    //const [endDate, setEndDate] = useState("");
+
+    const handleSubmit = async () => {
+        if (!partNumber || !partName || !level || !state || !revisionLevel || !assignedUserId || !programId) return;
+
+        //const formattedStartDate = formatISO(new Date(startDate), { representation: 'complete'});
+        //const formattedEndDate = formatISO(new Date(endDate), { representation: 'complete'});
+
+        await createPart({
+            number: Number(partNumber),
+            partName,
+            level: Number(level),
+            state,
+            revisionLevel,
+            assignedUserId: Number(assignedUserId),
+            programId: Number(programId),
+            parentId: Number(parentId),
+            //startDate: formattedStartDate,
+            //endDate: formattedEndDate
+        });
+    };
+
+    const isFormValid = () => {
+        return partNumber && partName && level && state && revisionLevel && assignedUserId && programId;
+    };
+
+    const inputStyles = "w-full rounded border border-gray-300 p-2 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none"
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} name="Create New Part">
+            <form 
+                className="mt-4 space-y-6"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit();
+                }}
+            >
+                <input
+                    type="number"
+                    className={inputStyles}
+                    placeholder="Part Number"
+                    value={partNumber}
+                    onChange={(e) => setPartNumber(e.target.value)}
+                />
+                <input
+                    type="text"
+                    className={inputStyles}
+                    placeholder="Part Name"
+                    value={partName}
+                    onChange={(e) => setPartName(e.target.value)}
+                />
+                <input
+                    type="number"
+                    className={inputStyles}
+                    placeholder="Level"
+                    value={level}
+                    onChange={(e) => setLevel(e.target.value)}
+                />
+                <input
+                    type="text"
+                    className={inputStyles}
+                    placeholder="State"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                />
+                <input
+                    type="text"
+                    className={inputStyles}
+                    placeholder="Revision Level"
+                    value={revisionLevel}
+                    onChange={(e) => setRevisionLevel(e.target.value)}
+                />
+                <input
+                    type="number"
+                    className={inputStyles}
+                    placeholder="Assigned User Id"
+                    value={assignedUserId}
+                    onChange={(e) => setAssignedUserId(e.target.value)}
+                />
+                <input
+                    type="number"
+                    className={inputStyles}
+                    placeholder="Program Id"
+                    value={programId}
+                    onChange={(e) => setProgramId(e.target.value)}
+                />
+                <input
+                    type="number"
+                    className={inputStyles}
+                    placeholder="Parent Part Id"
+                    value={parentId}
+                    onChange={(e) => setParentId(e.target.value)}
+                />
+                {/* <textarea
+                    className={inputStyles}
+                    placeholder="Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                />
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
+                    <input
+                        type="date"
+                        className={inputStyles}
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                    />
+                    <input
+                        type="date"
+                        className={inputStyles}
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                    />
+                </div> */}
+                <button
+                    type="submit"
+                    className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${
+                        !isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
+                    }`}
+                    disabled={!isFormValid() || isLoading}
+                >
+                    {isLoading ? "Creating..." : "Create Part"}
+                </button>
+            </form>
+        </Modal>
+    )
+};
+
+export default ModalNewPart;

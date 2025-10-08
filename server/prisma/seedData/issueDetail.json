@@ -1,0 +1,98 @@
+[
+    {
+        "id":27,
+        "issueType": "Defect",
+        "rootCause": "Connector misalignment causing partial shading",
+        "correctiveAction": "Realign connectors and retest panel output"
+    },
+    {
+        "id":28,
+        "issueType": "ProcessManufacturingIssue",
+        "rootCause": "Limited operator availability",
+        "correctiveAction": "Add additional operators and optimize assembly workflow"
+    },
+    {
+        "id":29,
+        "issueType": "IntegrationInterfaceIssue",
+        "rootCause": "Firmware version mismatch between devices",
+        "correctiveAction": "Update firmware and validate communication protocol"
+    },
+    {
+        "id":30,
+        "issueType": "NonConformanceReportNCR",
+        "rootCause": "Incorrect application parameters",
+        "correctiveAction": "Reapply coating using updated process parameters"
+    },
+    {
+        "id":31,
+        "issueType": "RequirementWaiver",
+        "rootCause": "Component tolerance limitations",
+        "correctiveAction": "Submit waiver for review"
+    },
+    {
+        "id":32,
+        "issueType": "TestVerificationAnomaly",
+        "rootCause": "Mounting bracket stiffness incorrect",
+        "correctiveAction": "Redesign bracket and repeat vibration test"
+    },
+    {
+        "id":33,
+        "issueType": "SupplyChainProcurementIssue",
+        "rootCause": "Supplier production backlog",
+        "correctiveAction": "Identify alternative suppliers and expedite shipping"
+    },
+    {
+        "id":34,
+        "issueType": "EnvironmentalReliabilityIssue",
+        "rootCause": "Inadequate insulation on battery cells",
+        "correctiveAction": "Redesign insulation and retest under TVAC"
+    },
+    {
+        "id":35,
+        "issueType": "ConfigurationDocumentationControlIssue",
+        "rootCause": "CAD update not reflected in BOM",
+        "correctiveAction": "Update BOM to reflect latest CAD revisions"
+    },
+    {
+        "id":36,
+        "issueType": "SafetyRegulatoryIssue",
+        "rootCause": "Incomplete test coverage",
+        "correctiveAction": "Perform additional certification tests"
+    },
+    {
+        "id":37,
+        "issueType": "Defect",
+        "rootCause": "Improper assembly during integration",
+        "correctiveAction": "Re-align optics and re-test calibration"
+    },
+    {
+        "id":38,
+        "issueType": "TestVerificationAnomaly",
+        "rootCause": "Loose connector detected",
+        "correctiveAction": "Secure connector and re-run functional tests"
+    },
+    {
+        "id":39,
+        "issueType": "NonConformanceReportNCR",
+        "rootCause": "Potential sensor degradation at elevated temperatures",
+        "correctiveAction": "Replace sensor and update calibration procedure"
+    },
+    {
+        "id":40,
+        "issueType": "ProcessManufacturingIssue",
+        "rootCause": "Assembly jig tolerance exceeded",
+        "correctiveAction": "Reposition sensor and tighten assembly jig tolerance"
+    },
+    {
+        "id":41,
+        "issueType": "IntegrationInterfaceIssue",
+        "rootCause": "Incorrect part from supplier",
+        "correctiveAction": "Replace connector and verify compatibility"
+    },
+    {
+        "id":42,
+        "issueType": "EnvironmentalReliabilityIssue",
+        "rootCause": "Component sensitivity outside expected range",
+        "correctiveAction": "Investigate shielding and update thermal design"
+    }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "disciplineTeamId": 1,
+    "programId": 1
+  },
+  {
+    "disciplineTeamId": 2,
+    "programId": 1
+  },
+  {
+    "disciplineTeamId": 3,
+    "programId": 1
+  },
+  {
+    "disciplineTeamId": 4,
+    "programId": 1
+  },
+  {
+    "disciplineTeamId": 1,
+    "programId": 2
+  },
+  {
+    "disciplineTeamId": 2,
+    "programId": 2
+  },
+  {
+    "disciplineTeamId": 3,
+    "programId": 2
+  },
+  {
+    "disciplineTeamId": 4,
+    "programId": 2
+  }
+]

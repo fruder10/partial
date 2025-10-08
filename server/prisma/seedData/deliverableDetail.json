@@ -1,0 +1,106 @@
+[    
+    {
+        "id":1,
+        "deliverableType": "SystemSubsystemRequirementsSpecificationSRS"
+    },
+    {
+        "id":2,
+        "deliverableType": "InterfaceControlDocumentICD"
+    },
+    {
+        "id":3,
+        "deliverableType": "PreliminaryDesignReviewPDRPackage"
+    },
+    {
+        "id":4,
+        "deliverableType": "RiskFailureModeEffectsAnalysisFMEADFMEAReport"
+    },
+    {
+        "id":5,
+        "deliverableType": "DevelopmentVerificationPlanVVMatrix"
+    },
+    {
+        "id":6,
+        "deliverableType": "EngineeringDrawingCADModel"
+    },
+    {
+        "id":7,
+        "deliverableType": "BillofMaterialsBOM"
+    },
+    {
+        "id":8,
+        "deliverableType": "StressStructuralAnalysisReport"
+    },
+    {
+        "id":9,
+        "deliverableType": "ThermalAnalysisReport"
+    },
+    {
+        "id":10,
+        "deliverableType": "ElectricalSchematicsPCBLayouts"
+    },
+    {
+        "id":11,
+        "deliverableType": "DesignforManufacturabilityDFMDesignforTestDFTReviewReport"
+    },
+    {
+        "id":12,
+        "deliverableType": "CriticalDesignReviewCDRPackage"
+    },
+    {
+        "id":13,
+        "deliverableType": "WorkInstructionsAssemblyProcedures"
+    },
+    {
+        "id":14,
+        "deliverableType": "FirstArticleInspectionFAIReport"
+    },
+    {
+        "id":15,
+        "deliverableType": "SupplierQualityRecordsCertificatesofConformanceCoC"
+    },
+    {
+        "id":16,
+        "deliverableType": "TestPlansandProcedures"
+    },
+    {
+        "id":17,
+        "deliverableType": "QualificationTestReport"
+    },
+    {
+        "id":18,
+        "deliverableType": "AcceptanceTestProcedureATPReport"
+    },
+    {
+        "id":19,
+        "deliverableType": "CalibrationCertificates"
+    },
+    {
+        "id":20,
+        "deliverableType": "NonConformanceCorrectiveActionReportNCRCAR"
+    },
+    {
+        "id":21,
+        "deliverableType": "RequirementsVerificationReport"
+    },
+    {
+        "id":22,
+        "deliverableType": "AsBuiltConfigurationEndItemDataPackage"
+    },
+    {
+        "id":23,
+        "deliverableType": "UserOperationsManual"
+    },
+    {
+        "id":24,
+        "deliverableType": "MaintenanceRepairManualSparePartsList"
+    },
+    {
+        "id":25,
+        "deliverableType": "CertificatesofCompliance"
+    },
+    {
+        "id":26,
+        "deliverableType": "LessonsLearnedPostProjectReport"
+    }
+]
