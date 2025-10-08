@@ -1,0 +1,266 @@
+[
+  {
+    "name": "Mission Concept Review (MCR)",
+    "description": "Initial review of overall mission concept and feasibility.",
+    "date": "2025-02-01T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "System Requirements Review (SRR)",
+    "description": "Verification of top-level system requirements.",
+    "date": "2025-03-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Mission Definition Review (MDR)",
+    "description": "Assessment of mission definition and architecture.",
+    "date": "2025-04-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "System Design Review (SDR)",
+    "description": "Evaluation of high-level system design maturity.",
+    "date": "2025-06-01T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Preliminary Design Review (PDR)",
+    "description": "Review of preliminary subsystem and component designs.",
+    "date": "2025-08-01T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Critical Design Review (CDR)",
+    "description": "Detailed design maturity and readiness for production.",
+    "date": "2026-01-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Production Readiness Review (PRR)",
+    "description": "Verification of manufacturing plans and supply readiness.",
+    "date": "2026-04-01T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Test Readiness Review (TRR)",
+    "description": "Assessment of test procedures, hardware, and facilities.",
+    "date": "2026-07-01T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Mechanical Integration",
+    "description": "Assembly and integration of structural and mechanical subsystems.",
+    "date": "2026-08-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Electrical Integration",
+    "description": "Integration of electrical harnesses, avionics, and power systems.",
+    "date": "2026-09-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Functional Testing",
+    "description": "Comprehensive functional verification of integrated hardware.",
+    "date": "2026-10-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Environmental Preparation",
+    "description": "Preparation for environmental testing phases.",
+    "date": "2026-11-01T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Vibration Testing",
+    "description": "Vibe testing to simulate launch loads.",
+    "date": "2026-11-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Thermal Vacuum (TVAC) Testing",
+    "description": "Thermal-vacuum testing for space environment verification.",
+    "date": "2026-12-01T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "EMI/EMC Testing",
+    "description": "Electromagnetic interference/compatibility verification.",
+    "date": "2027-01-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Final Functional Testing",
+    "description": "Last end-to-end functional check before shipment.",
+    "date": "2027-02-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "System Acceptance Review (SAR)",
+    "description": "Customer acceptance of final integrated system.",
+    "date": "2027-03-01T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Pre-Ship Review (PSR)",
+    "description": "Final logistics and configuration verification before shipping.",
+    "date": "2027-03-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Packaging & Shipment",
+    "description": "Packaging and transportation of flight hardware.",
+    "date": "2027-03-31T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Operational Readiness Review (ORR)",
+    "description": "Readiness of ground operations and support teams.",
+    "date": "2027-04-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Flight Readiness Review (FRR)",
+    "description": "Final review before launch authorization.",
+    "date": "2027-05-15T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Launch",
+    "description": "Mission launch of the integrated system.",
+    "date": "2027-06-30T00:00:00.000Z",
+    "programId": 1
+  },
+  {
+    "name": "Mission Concept Review (MCR)",
+    "description": "Initial review of overall mission concept and feasibility.",
+    "date": "2025-03-01T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "System Requirements Review (SRR)",
+    "description": "Verification of top-level system requirements.",
+    "date": "2025-04-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Mission Definition Review (MDR)",
+    "description": "Assessment of mission definition and architecture.",
+    "date": "2025-05-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "System Design Review (SDR)",
+    "description": "Evaluation of high-level system design maturity.",
+    "date": "2025-07-01T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Preliminary Design Review (PDR)",
+    "description": "Review of preliminary subsystem and component designs.",
+    "date": "2025-09-01T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Critical Design Review (CDR)",
+    "description": "Detailed design maturity and readiness for production.",
+    "date": "2026-02-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Production Readiness Review (PRR)",
+    "description": "Verification of manufacturing plans and supply readiness.",
+    "date": "2026-05-01T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Test Readiness Review (TRR)",
+    "description": "Assessment of test procedures, hardware, and facilities.",
+    "date": "2026-08-01T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Mechanical Integration",
+    "description": "Assembly and integration of structural and mechanical subsystems.",
+    "date": "2026-09-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Electrical Integration",
+    "description": "Integration of electrical harnesses, avionics, and power systems.",
+    "date": "2026-10-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Functional Testing",
+    "description": "Comprehensive functional verification of integrated hardware.",
+    "date": "2026-11-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Environmental Preparation",
+    "description": "Preparation for environmental testing phases.",
+    "date": "2026-12-01T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Vibration Testing",
+    "description": "Vibe testing to simulate launch loads.",
+    "date": "2026-12-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Thermal Vacuum (TVAC) Testing",
+    "description": "Thermal-vacuum testing for space environment verification.",
+    "date": "2027-01-01T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "EMI/EMC Testing",
+    "description": "Electromagnetic interference/compatibility verification.",
+    "date": "2027-02-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Final Functional Testing",
+    "description": "Last end-to-end functional check before shipment.",
+    "date": "2027-03-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "System Acceptance Review (SAR)",
+    "description": "Customer acceptance of final integrated system.",
+    "date": "2027-04-01T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Pre-Ship Review (PSR)",
+    "description": "Final logistics and configuration verification before shipping.",
+    "date": "2027-04-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Packaging & Shipment",
+    "description": "Packaging and transportation of flight hardware.",
+    "date": "2027-04-30T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Operational Readiness Review (ORR)",
+    "description": "Readiness of ground operations and support teams.",
+    "date": "2027-05-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Flight Readiness Review (FRR)",
+    "description": "Final review before launch authorization.",
+    "date": "2027-06-15T00:00:00.000Z",
+    "programId": 2
+  },
+  {
+    "name": "Launch",
+    "description": "Mission launch of the integrated system.",
+    "date": "2027-07-31T00:00:00.000Z",
+    "programId": 2
+  }
+]

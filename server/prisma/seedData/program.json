@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Lunar Lander",
+    "description": "End-to-end design, integration, and testing of a reusable lunar landing vehicle.",
+    "programManagerUserId": null,
+    "startDate": "2025-01-15T00:00:00.000Z",
+    "endDate": "2027-12-31T00:00:00.000Z"
+  },
+  {
+    "name": "Next-Gen Satellite",
+    "description": "Development of a modular satellite platform supporting multiple mission profiles.",
+    "programManagerUserId": null,
+    "startDate": "2025-03-01T00:00:00.000Z",
+    "endDate": "2028-06-30T00:00:00.000Z"
+  }
+]

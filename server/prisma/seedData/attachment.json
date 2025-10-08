@@ -1,0 +1,58 @@
+[
+  {
+    "fileUrl": "https://example.com/files/System_Requirements_v1.pdf",
+    "fileName": "System_Requirements_v1.pdf",
+    "dateAttached": "2025-09-17T12:00:00.000Z",
+    "uploadedByUserId": 12,
+    "workItemId": 1
+  },
+  {
+    "fileUrl": "https://example.com/files/ICD_Update.docx",
+    "fileName": "ICD_Update.docx",
+    "dateAttached": "2025-09-18T09:30:00.000Z",
+    "uploadedByUserId": 14,
+    "workItemId": 44
+  },
+  {
+    "fileUrl": "https://example.com/files/FEA_Results.xlsx",
+    "fileName": "FEA_Results.xlsx",
+    "dateAttached": "2025-09-19T15:45:00.000Z",
+    "uploadedByUserId": 15,
+    "workItemId": 45
+  },
+  {
+    "fileUrl": "https://example.com/files/PDR_Package.zip",
+    "fileName": "PDR_Package.zip",
+    "dateAttached": "2025-09-20T10:00:00.000Z",
+    "uploadedByUserId": 7,
+    "workItemId": 3
+  },
+  {
+    "fileUrl": "https://example.com/files/Test_Plan_v2.docx",
+    "fileName": "Test_Plan_v2.docx",
+    "dateAttached": "2025-09-21T14:20:00.000Z",
+    "uploadedByUserId": 13,
+    "workItemId": 16
+  },
+  {
+    "fileUrl": "https://example.com/files/Thermal_Analysis_Report.pdf",
+    "fileName": "Thermal_Analysis_Report.pdf",
+    "dateAttached": "2025-09-22T08:15:00.000Z",
+    "uploadedByUserId": 14,
+    "workItemId": 9
+  },
+  {
+    "fileUrl": "https://example.com/files/BOM_Final.xlsx",
+    "fileName": "BOM_Final.xlsx",
+    "dateAttached": "2025-09-23T11:50:00.000Z",
+    "uploadedByUserId": 12,
+    "workItemId": 7
+  },
+  {
+    "fileUrl": "https://example.com/files/DFM_DFT_Review.pdf",
+    "fileName": "DFM_DFT_Review.pdf",
+    "dateAttached": "2025-09-24T16:40:00.000Z",
+    "uploadedByUserId": 15,
+    "workItemId": 50
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Mechanical Engineering",
+    "description": "Design and development of structural and mechanical subsystems.",
+    "teamManagerUserId": 5
+  },
+  {
+    "name": "Electrical Engineering",
+    "description": "Responsible for avionics, power distribution, and electronics design.",
+    "teamManagerUserId": 3
+  },
+  {
+    "name": "Structural Engineering",
+    "description": "Analysis and verification of primary and secondary structures for loads, vibration, and fatigue.",
+    "teamManagerUserId": 9
+  },
+  {
+    "name": "Mechanisms Engineering",
+    "description": "Design and testing of deployable structures, actuators, and moving hardware interfaces.",
+    "teamManagerUserId": 8
+  }
+]
