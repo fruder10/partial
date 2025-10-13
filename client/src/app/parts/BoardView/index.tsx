@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { WorkItem as WorkItemType } from "@/state/api";
-import { EllipsisVertical, MessageSquareMore, Plus } from 'lucide-react';
+import { EllipsisVertical, MessageSquareMore, Plus, CircleUser } from 'lucide-react';
 import { format } from "date-fns";
 import Image from 'next/image';
 import Link from 'next/link';
@@ -162,6 +162,12 @@ const WorkItem = ({ workItem, setEditingWorkItem }: WorkItemProps) => {
     const formattedDueDate = workItem.dueDate
         ? format(new Date(workItem.dueDate), "P")
         : "";
+    const formattedEstimatedCompletionDate = workItem.estimatedCompletionDate
+        ? format(new Date(workItem.estimatedCompletionDate), "P")
+        : "";
+    const formattedActualCompletionDate = workItem.actualCompletionDate
+        ? format(new Date(workItem.actualCompletionDate), "P")
+        : "";
 
     const numberOfComments = (workItem.comments && workItem.comments.length) || 0;
 
@@ -227,12 +233,44 @@ const WorkItem = ({ workItem, setEditingWorkItem }: WorkItemProps) => {
                 </div>
 
                 <div className="text-xs text-gray-500 dark:text-neutral-500">
-                    {formattedDateOpened && <span>{formattedDateOpened} - </span>}
-                    {formattedDueDate && <span>{formattedDueDate}</span>}
+                    {formattedDateOpened && <span>{formattedDateOpened} (opened) - </span>}
+                    {formattedDueDate && <span>{formattedDueDate} (due)</span>}
                 </div>
-                <p className="text-xs text-gray-600 dark:text-neutral-500">
-                    {workItem.description}
+                <p className="text-xs text-gray-500 dark:text-neutral-500">
+                    Description: {workItem.description}
                 </p>
+                {workItem.workItemType === "Issue" && workItem.issueDetail && (
+                    <div className="text-xs text-gray-500 dark:text-neutral-500">
+                        {workItem.issueDetail.rootCause && (
+                            <p>
+                                <span>Root Cause:</span>{" "}
+                                {workItem.issueDetail.rootCause}
+                            </p>
+                        )}
+                        {workItem.issueDetail.correctiveAction && (
+                            <p>
+                                <span>Corrective Action:</span>{" "}
+                                {workItem.issueDetail.correctiveAction}
+                            </p>
+                        )}
+                    </div>
+                )}
+                <div className="text-xs text-gray-500 dark:text-neutral-500">
+                    {formattedEstimatedCompletionDate && <span>Estimated Completion Date: {formattedEstimatedCompletionDate}</span>}
+                </div>
+                {workItem.status === "Completed" && (
+                    <div className="text-xs text-gray-500 dark:text-neutral-500">
+                        <p>
+                            <span>Actual Completion Date:</span>{" "}
+                            {formattedActualCompletionDate}
+                        </p>
+                    </div>
+                )}
+                {workItem.status !== "Completed" && (
+                    <p className="text-xs text-gray-500 dark:text-neutral-500">
+                        Current Status: {workItem.inputStatus}
+                    </p>
+                )}
                 {workItem.attachments && workItem.attachments.length > 0 && (
                 // <Image
                 //     src={`/${workItem.attachments[0].fileUrl}`}
@@ -241,36 +279,47 @@ const WorkItem = ({ workItem, setEditingWorkItem }: WorkItemProps) => {
                 //     height={200}
                 //     className="h-auto w-full rounded-t-md"
                 // />
-                <Link href={`/${workItem.attachments[0].fileUrl}`}>
-                    {workItem.attachments[0].fileName}
-                </Link>
+                    <div className="mt-2 space-y-1 text-xs text-gray-500 dark:text-neutral-500">
+                        <Link href={`/${workItem.attachments[0].fileUrl}`}>
+                            {workItem.attachments[0].fileName}
+                        </Link>
+                    </div>
                 )}
                 <div className="mt-4 border-t border-gray-200 dark-border-stroke-dark" />
 
                 {/* USERS */}
                 <div className="mt-3 flex items-center justify-between">
                     <div className="flex -space-x-[6px] overflow-hidden">
-                        {workItem.assigneeUser && (
-                            <Image
-                                key={workItem.assigneeUser.userId}
-                                src={`/${workItem.assigneeUser.profilePictureUrl!}`}
-                                alt={workItem.assigneeUser.username}
-                                width={30}
-                                height={30}
-                                className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
-                            />
-                        )}
-                        {workItem.authorUser && (
-                            <Image
-                                //key={`${workItem.id}-${workItem.authorUser.userId}`}
-                                src={`/${workItem.authorUser.profilePictureUrl!}`}
-                                alt={workItem.authorUser.username}
-                                width={30}
-                                height={30}
-                                className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
-                            />
-                        )}
+                        {[workItem.assigneeUser, workItem.authorUser].map((user, index) => {
+                            if (!user) return null;
+
+                            const uniqueKey = `${user.userId}-${index}`;
+                            const role = index === 0 ? "Assignee" : "Author"; // Determine role
+                            const tooltip = `${role}: ${user.name}`;
+
+                            return user.profilePictureUrl ? (
+                                <Image
+                                    key={uniqueKey}
+                                    src={`/${user.profilePictureUrl}`}
+                                    alt={user.username}
+                                    title={tooltip}  // <-- tooltip on hover
+                                    width={30}
+                                    height={30}
+                                    className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
+                                />
+                            ) : (
+                                <div
+                                    key={uniqueKey}
+                                    title={tooltip}  // <-- tooltip on hover
+                                    className="h-8 w-8 rounded-full border-2 border-white text-gray-400 dark:border-dark-secondary"
+                                >
+                                    <CircleUser size={24} />
+                                </div>
+                            );
+                        })}
                     </div>
+
+                    {/* Comments */}
                     <div className="flex items-center text-gray-500 dark:text-neutral-500">
                         <MessageSquareMore size={20} />
                         <span className="ml-1 text-sm dark:text-neutral-400">

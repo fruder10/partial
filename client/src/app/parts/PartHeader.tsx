@@ -1,16 +1,19 @@
 import Header from '@/components/Header';
-import { Clock, Filter, Grid3x3, List, PlusSquare, Share2, Table } from 'lucide-react';
+import { Clock, Filter, Grid3x3, List, PlusSquare, Share2, SquarePen, Table } from 'lucide-react';
 import React, { useState } from 'react';
 import ModalNewPart from "./ModalNewPart";
+import ModalEditPart from "./ModalEditPart";
+import { PartNumber } from '@/state/api';
 
 type Props = {
     activeTab: string;
     setActiveTab: (tabname: string) => void
-    activePart?: { number: number; partName: string } | null;
+    activePart?: Partial<PartNumber> | null;
 };
 
 const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
     const [isModalNewPartOpen, setIsModalNewPartOpen] = useState(false); // MODAL IS THE + BUTTON TO ADD A NEW PART
+    const [isModalEditPartOpen, setIsModalEditPartOpen] = useState(false);
     const headerTitle = activePart
         ? `${activePart.number} - ${activePart.partName}: Tasks, Deliverables, and Issues`
         : "My Part's Tasks, Deliverables, and Issues";
@@ -21,15 +24,31 @@ const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
                 isOpen={isModalNewPartOpen}
                 onClose={() => setIsModalNewPartOpen(false)}
             />
+            <ModalEditPart
+                isOpen={isModalEditPartOpen}
+                onClose={() => setIsModalEditPartOpen(false)}
+                part={activePart ? { ...activePart, id: activePart.id ?? 0 } : null}
+            />
             <div className="pb-6 pt-6 lg:pb-4 lg:pt-8">
                 <Header name={headerTitle}
                     buttonComponent={
+                        <div className="flex gap-3">
+                        {/* New Part Button */}
                         <button
                             className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
                             onClick={() => setIsModalNewPartOpen(true)}
                         >
                             <PlusSquare className="mr-2 h-5 w-5" />New Part
                         </button>
+                        {/* Edit Part Button */}
+                        <button
+                            className="flex items-center rounded-md bg-gray-300 px-3 py-2 text-gray-800 hover:bg-gray-400 dark:bg-dark-tertiary dark:text-white"
+                            onClick={() => setIsModalEditPartOpen(true)}
+                            disabled={!activePart}
+                        >
+                            <SquarePen className="mr-2 h-5 w-5" />Edit Part
+                        </button>
+                        </div>
                     }
                 />
             </div>

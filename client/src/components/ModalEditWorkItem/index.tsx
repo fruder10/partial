@@ -4,6 +4,7 @@ import Modal from '@/components/Modal';
 import {
   Priority,
   Status,
+  StatusLabels,
   WorkItemType,
   DeliverableType,
   DeliverableTypeLabels,
@@ -11,7 +12,12 @@ import {
   IssueTypeLabels,
   useEditWorkItemMutation,
   useDeleteWorkItemMutation,
-  WorkItem as WorkItemTypeModel
+  WorkItem as WorkItemTypeModel,
+  WorkItemEditInput,
+  useGetPartsQuery,
+  useGetProgramsQuery,
+  useGetMilestonesQuery,
+  useGetUsersQuery
 } from '@/state/api';
 import React, { useEffect, useState } from 'react';
 import { formatISO } from 'date-fns';
@@ -25,6 +31,10 @@ type Props = {
 const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
   const [editWorkItem, { isLoading: isSaving }] = useEditWorkItemMutation();
   const [deleteWorkItem, { isLoading: isDeleting }] = useDeleteWorkItemMutation();
+  const { data: parts = [], isLoading: partsLoading } = useGetPartsQuery();
+  const { data: programs = [], isLoading: programsLoading } = useGetProgramsQuery();
+  const { data: milestones = [], isLoading: milestonesLoading } = useGetMilestonesQuery();
+  const { data: users = [], isLoading: usersLoading } = useGetUsersQuery();
 
   // form state
   const [workItemType, setWorkItemType] = useState<WorkItemType | "">("");
@@ -39,10 +49,15 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
   const [actualCompletionDate, setActualCompletionDate] = useState("");
   const [percentComplete, setPercentComplete] = useState<number>(0);
   const [inputStatus, setInputStatus] = useState("");
+  const [partNumberIds, setPartNumberIds] = useState<number[]>([]);
   const [programId, setProgramId] = useState("");
+  const [programName, setProgramName] = useState("");
   const [dueByMilestoneId, setDueByMilestoneId] = useState("");
+  const [milestoneName, setMilestoneName] = useState("");
   const [authorUserId, setAuthorUserId] = useState("");
+  const [authorUserName, setAuthorUserName] = useState("");
   const [assignedUserId, setAssignedUserId] = useState("");
+  const [assignedUserName, setAssignedUserName] = useState("");
 
   const [issueType, setIssueType] = useState<IssueType | "">("");
   const [rootCause, setRootCause] = useState("");
@@ -52,6 +67,7 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
   // Prefill all fields when modal opens
   useEffect(() => {
     if (workItem) {
+      console.log("workItem.partNumbers", workItem.partNumbers);
       setWorkItemType(workItem.workItemType || "");
       setTitle(workItem.title || "");
       setDescription(workItem.description || "");
@@ -68,10 +84,27 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
       );
       setPercentComplete(workItem.percentComplete || 0);
       setInputStatus(workItem.inputStatus || "");
+      setPartNumberIds(workItem.partNumbers?.map((p) => p.partNumberId) || []);
+      
       setProgramId(workItem.programId?.toString() || "");
+      // Prefill program name if known
+      const program = programs.find((p) => p.id === workItem.programId);
+      setProgramName(program?.name || "");
+
       setDueByMilestoneId(workItem.dueByMilestoneId?.toString() || "");
+      // Prefill milestone name if known
+      const milestone = milestones.find((p) => p.id === workItem.dueByMilestoneId);
+      setMilestoneName(milestone?.name || "");
+
       setAuthorUserId(workItem.authorUserId?.toString() || "");
+      // prefill authorUserName if workItem.authorUserId is known
+      const authorUser = users.find((u) => u.userId === workItem.authorUserId);
+      setAuthorUserName(authorUser?.name || "");
+
       setAssignedUserId(workItem.assignedUserId?.toString() || "");
+      // prefill assignedUserName if workItem.assignedUserId is known
+      const assignedUser = users.find((u) => u.userId === workItem.assignedUserId);
+      setAssignedUserName(assignedUser?.name || "");
 
       if (workItem.workItemType === WorkItemType.Issue && workItem.issueDetail) {
         setIssueType(workItem.issueDetail.issueType || "");
@@ -81,7 +114,7 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
         setDeliverableType(workItem.deliverableDetail.deliverableType || "");
       }
     }
-  }, [workItem]);
+  }, [workItem, programs, milestones, users]);
 
   const isFormValid = (): boolean =>
     !!workItemType &&
@@ -102,8 +135,7 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
   const handleSubmit = async () => {
     if (!workItem || !isFormValid()) return;
 
-    const updatedWorkItem: WorkItemTypeModel = {
-      ...workItem,
+    const updatedWorkItem: WorkItemEditInput = {
       workItemType: workItemType as WorkItemType,
       status: status as Status,
       priority: priority as Priority,
@@ -118,13 +150,13 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
         : undefined,
       percentComplete,
       inputStatus,
+      partNumberIds,
       programId: parseInt(programId),
       dueByMilestoneId: parseInt(dueByMilestoneId),
       authorUserId: parseInt(authorUserId),
       assignedUserId: parseInt(assignedUserId),
       issueDetail: workItemType === WorkItemType.Issue
         ? {
-            id: workItem.issueDetail?.id ?? 0,
             issueType: issueType as IssueType,
             rootCause,
             correctiveAction,
@@ -132,7 +164,6 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
         : undefined,
       deliverableDetail: workItemType === WorkItemType.Deliverable
         ? {
-            id: workItem.deliverableDetail?.id ?? 0,
             deliverableType: deliverableType as DeliverableType,
           }
         : undefined,
@@ -307,7 +338,9 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
             >
                 <option value="">Select Status</option>
                 {Object.values(Status).map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>
+                  {StatusLabels[s]}
+                </option>
                 ))}
             </select>
           </div>
@@ -399,55 +432,120 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
         </div>
 
         <div>
-            <label className="block text-sm text-gray-600 dark:text-gray-300">
-                Program:
-            </label>
-            <input
-            type="text"
+          <label className="block text-sm text-gray-600 dark:text-gray-300">
+            Affected Part Number(s):
+          </label>
+          <select
+            multiple
             className={inputStyles}
-            placeholder="Program Id"
+            value={partNumberIds.map(String)} // convert numbers to strings for <select>
+            onChange={(e) => {
+              const selectedOptions = Array.from(e.target.selectedOptions);
+              const ids = selectedOptions.map((opt) => Number(opt.value));
+              setPartNumberIds(ids);
+            }}
+            disabled={partsLoading}
+          >
+            {parts.map((part) => (
+              <option key={part.id} value={part.id}>
+                {part.number} - {part.partName}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-300">
+            Hold <kbd>Ctrl</kbd> (Windows) or <kbd>Cmd</kbd> (Mac) to select multiple.
+          </p>
+        </div>
+        <div>
+          <label className="block text-sm text-gray-600 dark:text-gray-300">
+              Program:
+          </label>
+          <select
+            className={inputStyles}
             value={programId}
-            onChange={(e) => setProgramId(e.target.value)}
-            />
+            onChange={(e) => {
+              setProgramId(e.target.value);
+              const selected = programs.find((p) => p.id === Number(e.target.value));
+              setProgramName(selected?.name || "");
+            }}
+            disabled={programsLoading}
+          >
+            <option value="">Select Program</option>
+            {programs.map((program) => (
+              <option key={program.id} value={program.id}>
+                {program.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
-            <label className="block text-sm text-gray-600 dark:text-gray-300">
-                Milestone:
-            </label>
-            <input
-            type="text"
+          <label className="block text-sm text-gray-600 dark:text-gray-300">
+              Milestone:
+          </label>
+          <select
             className={inputStyles}
-            placeholder="Due By Milestone Id"
             value={dueByMilestoneId}
-            onChange={(e) => setDueByMilestoneId(e.target.value)}
-            />
+            onChange={(e) => {
+              setDueByMilestoneId(e.target.value);
+              const selected = milestones.find((p) => p.id === Number(e.target.value));
+              setMilestoneName(selected?.name || "");
+            }}
+            disabled={milestonesLoading}
+          >
+            <option value="">Select Milestone</option>
+            {milestones.map((milestone) => (
+              <option key={milestone.id} value={milestone.id}>
+                {milestone.name}
+              </option>
+            ))}
+          </select>
         </div>
         
         <div>
             <label className="block text-sm text-gray-600 dark:text-gray-300">
                 Author:
             </label>
-            <input
-            type="text"
-            className={inputStyles}
-            placeholder="Author User ID"
-            value={authorUserId}
-            onChange={(e) => setAuthorUserId(e.target.value)}
-            />
+            <select
+              className={inputStyles}
+              value={authorUserId}
+              onChange={(e) => {
+                setAuthorUserId(e.target.value);
+                const selected = users.find((u) => u.userId === Number(e.target.value));
+                setAuthorUserName(selected?.name || "");
+              }}
+              disabled={usersLoading}
+            >
+              <option value="">Select Author User</option>
+              {users.map((user) => (
+                <option key={user.userId} value={user.userId}>
+                  {user.name} ({user.username})
+                </option>
+              ))}
+            </select>
         </div>
 
         <div>
             <label className="block text-sm text-gray-600 dark:text-gray-300">
                 Assignee:
             </label>
-            <input
-            type="text"
-            className={inputStyles}
-            placeholder="Assigned User ID"
-            value={assignedUserId}
-            onChange={(e) => setAssignedUserId(e.target.value)}
-            />
+            <select
+              className={inputStyles}
+              value={assignedUserId}
+              onChange={(e) => {
+                setAssignedUserId(e.target.value);
+                const selected = users.find((u) => u.userId === Number(e.target.value));
+                setAssignedUserName(selected?.name || "");
+              }}
+              disabled={usersLoading}
+            >
+              <option value="">Select Assigned User</option>
+              {users.map((user) => (
+                <option key={user.userId} value={user.userId}>
+                  {user.name} ({user.username})
+                </option>
+              ))}
+            </select>
         </div>
 
         {/* Submit */}
@@ -468,7 +566,7 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
             }`}
             disabled={isDeleting}
         >
-            {isDeleting ? "Deleting..." : "Delete"}
+            {isDeleting ? `Deleting ${workItemType}` : `Delete ${workItemType}`}
         </button>
       </form>
     </Modal>

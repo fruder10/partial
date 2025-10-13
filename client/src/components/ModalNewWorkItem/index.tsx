@@ -2,10 +2,16 @@ import Modal from '@/components/Modal';
 import {
   Priority,
   Status,
+  StatusLabels,
   WorkItemType,
   DeliverableType,
   IssueType,
-  useCreateWorkItemMutation
+  useCreateWorkItemMutation,
+  WorkItemCreateInput,
+  useGetPartsQuery,
+  useGetUsersQuery,
+  useGetProgramsQuery,
+  useGetMilestonesQuery
 } from '@/state/api';
 import React, { useState } from 'react';
 import { formatISO } from 'date-fns';
@@ -23,6 +29,10 @@ const ModalNewWorkItem = ({
   id = null,
   workItemType: initialWorkItemType = WorkItemType.Task,
 }: Props) => {
+  const { data: parts = [], isLoading: partsLoading } = useGetPartsQuery();
+  const { data: users = [], isLoading: usersLoading } = useGetUsersQuery();
+  const { data: programs = [], isLoading: programsLoading } = useGetProgramsQuery();
+  const { data: milestones = [], isLoading: milestonesLoading } = useGetMilestonesQuery();
   const [createWorkItem, { isLoading }] = useCreateWorkItemMutation();
   const [workItemType, setWorkItemType] = useState<WorkItemType | "">("");
   const [title, setTitle] = useState("");
@@ -36,6 +46,7 @@ const ModalNewWorkItem = ({
   const [actualCompletionDate, setActualCompletionDate] = useState("");
   const [percentComplete, setPercentComplete] = useState<number>(0);
   const [inputStatus, setInputStatus] = useState("");
+  const [partNumberIds, setPartNumberIds] = useState<number[]>([]);
   const [programId, setProgramId] = useState("");
   const [dueByMilestoneId, setDueByMilestoneId] = useState("");
   const [authorUserId, setAuthorUserId] = useState("");
@@ -58,12 +69,12 @@ const ModalNewWorkItem = ({
       : undefined;
 
 
-    const payload: any = {
-      workItemType,
+    const payload: WorkItemCreateInput = {
+      workItemType: workItemType as WorkItemType,
       title,
       description,
-      status,
-      priority,
+      status: status as Status,
+      priority: priority as Priority,
       tags,
       dateOpened: formattedDateOpened,
       dueDate: formattedDueDate,
@@ -80,17 +91,22 @@ const ModalNewWorkItem = ({
     // Add subtype-specific data
     if (workItemType === WorkItemType.Issue) {
       payload.issueDetail = {
-        issueType,
+        issueType: issueType as IssueType,
         rootCause,
         correctiveAction,
       };
     } else if (workItemType === WorkItemType.Deliverable) {
       payload.deliverableDetail = {
-        deliverableType,
+        deliverableType: deliverableType as DeliverableType,
       };
     }
 
-    await createWorkItem(payload);
+    try {
+      await createWorkItem(payload).unwrap();
+      onClose(); // close modal on success
+    } catch (err) {
+    console.error("Failed to create work item:", err);
+    }
   };
 
   const isFormValid = (): boolean => {
@@ -221,10 +237,11 @@ const ModalNewWorkItem = ({
             onChange={(e) => setStatus(e.target.value as Status)}
           >
             <option value="">Select Status</option>
-            <option value={Status.ToDo}>To Do</option>
-            <option value={Status.WorkInProgress}>Work In Progress</option>
-            <option value={Status.UnderReview}>Under Review</option>
-            <option value={Status.Completed}>Completed</option>
+            {Object.values(Status).map((s) => (
+              <option key={s} value={s}>
+                {StatusLabels[s]}
+              </option>
+            ))}
           </select>
           <select
             className={selectStyles}
@@ -316,35 +333,83 @@ const ModalNewWorkItem = ({
           value={inputStatus}
           onChange={(e) => setInputStatus(e.target.value)}
         />
-        <input
-          type="text"
+        <div>
+          <label className="block text-sm text-gray-600 dark:text-gray-300">
+            Affected Part Number(s):
+          </label>
+          <select
+            multiple
+            className={inputStyles}
+            value={partNumberIds.map(String)}
+            onChange={(e) => {
+              const selectedOptions = Array.from(e.target.selectedOptions);
+              const ids = selectedOptions.map((opt) => Number(opt.value));
+              setPartNumberIds(ids);
+            }}
+            disabled={partsLoading}
+          >
+            {parts?.map((part) => (
+              <option key={part.id} value={part.id}>
+                {part.number} - {part.partName}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-300">
+            Hold <kbd>Ctrl</kbd> (Windows) or <kbd>Cmd</kbd> (Mac) to select multiple.
+          </p>
+        </div>
+        <select
           className={inputStyles}
-          placeholder="Program Id"
           value={programId}
           onChange={(e) => setProgramId(e.target.value)}
-        />
-        <input
-          type="text"
+          disabled={programsLoading}
+        >
+          <option value="">Select Program</option>
+          {programs.map((program) => (
+            <option key={program.id} value={program.id}>
+            {program.name}
+            </option>
+          ))}
+        </select>
+        <select
           className={inputStyles}
-          placeholder="Due By Milestone Id"
           value={dueByMilestoneId}
           onChange={(e) => setDueByMilestoneId(e.target.value)}
-        />
-        <input
-          type="text"
+          disabled={milestonesLoading}
+        >
+          <option value="">Select Milestone</option>
+          {milestones.map((milestone) => (
+              <option key={milestone.id} value={milestone.id}>
+              {milestone.name}
+              </option>
+          ))}
+        </select>
+        <select
           className={inputStyles}
-          placeholder="Author User ID"
           value={authorUserId}
           onChange={(e) => setAuthorUserId(e.target.value)}
-        />
-        <input
-          type="text"
+          disabled={usersLoading}
+        >
+          <option value="">Select Author User</option>
+          {users.map((user) => (
+              <option key={user.userId} value={user.userId}>
+              {user.name} ({user.username})
+              </option>
+          ))}
+        </select>
+        <select
           className={inputStyles}
-          placeholder="Assigned User ID"
           value={assignedUserId}
           onChange={(e) => setAssignedUserId(e.target.value)}
-        />
-
+          disabled={usersLoading}
+        >
+          <option value="">Select Assigned User</option>
+          {users.map((user) => (
+              <option key={user.userId} value={user.userId}>
+              {user.name} ({user.username})
+              </option>
+          ))}
+        </select>
         
 
         <button

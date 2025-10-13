@@ -1,6 +1,64 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
+// Define a type for creates
+type WorkItemCreate = {
+  workItemType: string;
+  title: string;
+  description?: string;
+  status: string;
+  priority: string;
+  tags?: string;
+  dateOpened?: string;
+  dueDate: string;
+  estimatedCompletionDate: string;
+  actualCompletionDate?: string;
+  percentComplete?: number;
+  inputStatus?: string;
+  programId: number;
+  dueByMilestoneId: number;
+  authorUserId: number;
+  assignedUserId: number;
+  issueDetail?: {
+    issueType: string;
+    rootCause?: string;
+    correctiveAction?: string;
+  };
+  deliverableDetail?: {
+    deliverableType: string;
+  };
+  partNumberIds?: number[];
+};
+
+// Define a type for updates
+type WorkItemUpdate = {
+  workItemType?: string;
+  title?: string;
+  description?: string;
+  status?: string;
+  priority?: string;
+  tags?: string;
+  dateOpened?: string;
+  dueDate?: string;
+  estimatedCompletionDate?: string;
+  actualCompletionDate?: string;
+  percentComplete?: number;
+  inputStatus?: string;
+  programId?: number;
+  dueByMilestoneId?: number;
+  authorUserId?: number;
+  assignedUserId?: number;
+  issueDetail?: {
+    issueType?: string;
+    rootCause?: string;
+    correctiveAction?: string;
+  };
+  deliverableDetail?: {
+    deliverableType?: string;
+  };
+  partNumberIds?: number[];
+};
+
 const prisma = new PrismaClient();
 
 /**
@@ -119,74 +177,77 @@ export const getWorkItemsByUser = async (req: Request, res: Response): Promise<v
  * Handles DeliverableDetail or IssueDetail based on type
  */
 export const createWorkItem = async (req: Request, res: Response): Promise<void> => {
-  const {
-    workItemType,
-    title,
-    description,
-    status,
-    priority,
-    tags,
-    dateOpened,
-    dueDate,
-    estimatedCompletionDate,
-    actualCompletionDate,
-    percentComplete,
-    inputStatus,
-    programId,
-    dueByMilestoneId,
-    authorUserId,
-    assignedUserId,
-    deliverableType,
-    issueType,
-    rootCause,
-    correctiveAction,
-  } = req.body;
+  const body = req.body as WorkItemCreate;
 
   try {
+    // 1️⃣ Prepare WorkItem data
+    const workItemData: any = {
+      workItemType: body.workItemType,
+      title: body.title,
+      description: body.description,
+      status: body.status,
+      priority: body.priority,
+      tags: body.tags,
+      dateOpened: body.dateOpened ? new Date(body.dateOpened) : undefined,
+      dueDate: new Date(body.dueDate),
+      estimatedCompletionDate: new Date(body.estimatedCompletionDate),
+      actualCompletionDate: body.actualCompletionDate ? new Date(body.actualCompletionDate) : undefined,
+      percentComplete: body.percentComplete,
+      inputStatus: body.inputStatus,
+      programId: body.programId,
+      dueByMilestoneId: body.dueByMilestoneId,
+      authorUserId: body.authorUserId,
+      assignedUserId: body.assignedUserId,
+      // ✅ subtype creation
+      issueDetail: body.issueDetail
+        ? {
+            create: {
+              issueType: body.issueDetail.issueType,
+              rootCause: body.issueDetail.rootCause,
+              correctiveAction: body.issueDetail.correctiveAction,
+            },
+          }
+        : undefined,
+      deliverableDetail: body.deliverableDetail
+        ? {
+            create: {
+              deliverableType: body.deliverableDetail.deliverableType,
+            },
+          }
+        : undefined,
+      // ✅ partNumber links
+      partNumbers: body.partNumberIds?.length
+        ? {
+            create: body.partNumberIds.map((id) => ({
+              partNumber: { connect: { id } },
+            })),
+          }
+        : undefined,
+    };
+
+    // 2️⃣ Create WorkItem
     const newWorkItem = await prisma.workItem.create({
-      data: {
-        workItemType,
-        title,
-        description,
-        status,
-        priority,
-        tags,
-        dateOpened,
-        dueDate,
-        estimatedCompletionDate,
-        actualCompletionDate,
-        percentComplete,
-        inputStatus,
-        programId,
-        dueByMilestoneId,
-        authorUserId,
-        assignedUserId,
-        // ✅ create subtype record depending on work item type
-        deliverableDetail: deliverableType
-          ? {
-              create: {
-                deliverableType,
-              },
-            }
-          : undefined,
-        issueDetail: issueType
-          ? {
-              create: {
-                issueType,
-                rootCause,
-                correctiveAction,
-              },
-            }
-          : undefined,
-      },
+      data: workItemData,
       include: {
+        program: true,
+        dueByMilestone: true,
         deliverableDetail: true,
         issueDetail: true,
+        authorUser: true,
+        assigneeUser: true,
+        comments: true,
+        partNumbers: { include: { partNumber: true } },
       },
     });
-    res.status(201).json(newWorkItem);
+
+    // 3️⃣ Flatten partNumberIds for frontend
+    res.status(201).json({
+      ...newWorkItem,
+      partNumberIds: newWorkItem.partNumbers.map((p) => p.partNumberId),
+    });
   } catch (error: any) {
-    res.status(500).json({ message: `Error creating a work item: ${error.message}` });
+    console.error("Error creating work item:", error);
+    res.status(500).json({ message: `Error creating work item: ${error.message}` });
   }
 };
 
@@ -211,67 +272,70 @@ export const updateWorkItemStatus = async (req: Request, res: Response): Promise
   }
 };
 
-/**
- * Edit (update) WorkItem
- */
-export const editWorkItem = async (req: Request, res: Response): Promise<void> => {
+
+export const editWorkItem = async (req: Request, res: Response) => {
   const { workItemId } = req.params;
-  const updates = req.body; // Partial<WorkItem>
+  const updates = req.body as WorkItemUpdate;
 
   try {
-    // Build the update payload safely
+    // 1️⃣ Update part numbers first
+    if (Array.isArray(updates.partNumberIds)) {
+      await prisma.workItemToPartNumber.deleteMany({
+        where: { workItemId: Number(workItemId) },
+      });
+
+      if (updates.partNumberIds.length > 0) {
+        await prisma.workItemToPartNumber.createMany({
+          data: updates.partNumberIds.map((partNumberId) => ({
+            workItemId: Number(workItemId),
+            partNumberId,
+          })),
+        });
+      }
+    }
+
+    // 2️⃣ Build the update object with type safety
+    const updateData: any = {};
+
+    if (updates.workItemType) updateData.workItemType = updates.workItemType;
+    if (updates.title) updateData.title = updates.title;
+    if (updates.description) updateData.description = updates.description;
+    if (updates.status) updateData.status = updates.status;
+    if (updates.priority) updateData.priority = updates.priority;
+    if (updates.tags) updateData.tags = updates.tags;
+    if (updates.dateOpened) updateData.dateOpened = new Date(updates.dateOpened);
+    if (updates.dueDate) updateData.dueDate = new Date(updates.dueDate);
+    if (updates.estimatedCompletionDate) updateData.estimatedCompletionDate = new Date(updates.estimatedCompletionDate);
+    if (updates.actualCompletionDate) updateData.actualCompletionDate = new Date(updates.actualCompletionDate);
+    if (typeof updates.percentComplete === "number") updateData.percentComplete = updates.percentComplete;
+    if (updates.inputStatus) updateData.inputStatus = updates.inputStatus;
+    if (updates.programId !== undefined) updateData.programId = updates.programId;
+    if (updates.dueByMilestoneId !== undefined) updateData.dueByMilestoneId = updates.dueByMilestoneId;
+    if (updates.authorUserId !== undefined) updateData.authorUserId = updates.authorUserId;
+    if (updates.assignedUserId !== undefined) updateData.assignedUserId = updates.assignedUserId;
+
+    if (updates.issueDetail) {
+      updateData.issueDetail = {
+        update: {
+          ...(updates.issueDetail.issueType && { issueType: updates.issueDetail.issueType }),
+          ...(updates.issueDetail.rootCause && { rootCause: updates.issueDetail.rootCause }),
+          ...(updates.issueDetail.correctiveAction && { correctiveAction: updates.issueDetail.correctiveAction }),
+        },
+      };
+    }
+
+    if (updates.deliverableDetail) {
+      updateData.deliverableDetail = {
+        update: {
+          ...(updates.deliverableDetail.deliverableType && { deliverableType: updates.deliverableDetail.deliverableType }),
+        },
+      };
+    }
+
+    // 3️⃣ Update WorkItem
     const updatedWorkItem = await prisma.workItem.update({
       where: { id: Number(workItemId) },
-      data: {
-        ...(updates.workItemType && { workItemType: updates.workItemType }),
-        ...(updates.title && { title: updates.title }),
-        ...(updates.description && { description: updates.description }),
-        ...(updates.status && { status: updates.status }),
-        ...(updates.priority && { priority: updates.priority }),
-        ...(updates.tags && { tags: updates.tags }),
-        ...(updates.dateOpened && { dateOpened: new Date(updates.dateOpened) }),
-        ...(updates.dueDate && { dueDate: new Date(updates.dueDate) }),
-        ...(updates.estimatedCompletionDate && {
-          estimatedCompletionDate: new Date(updates.estimatedCompletionDate),
-        }),
-        ...(updates.actualCompletionDate && {
-          actualCompletionDate: new Date(updates.actualCompletionDate),
-        }),
-        ...(typeof updates.percentComplete === "number" && {
-          percentComplete: updates.percentComplete,
-        }),
-        ...(updates.inputStatus && { inputStatus: updates.inputStatus }),
-        ...(updates.programId && { programId: updates.programId }),
-        ...(updates.dueByMilestoneId && { dueByMilestoneId: updates.dueByMilestoneId }),
-        ...(updates.authorUserId && { authorUserId: updates.authorUserId }),
-        ...(updates.assignedUserId && { assignedUserId: updates.assignedUserId }),
-
-        ...(updates.issueDetail && {
-          issueDetail: {
-            update: {
-              ...(updates.issueDetail.issueType && {
-                issueType: updates.issueDetail.issueType,
-              }),
-              ...(updates.issueDetail.rootCause && {
-                rootCause: updates.issueDetail.rootCause,
-              }),
-              ...(updates.issueDetail.correctiveAction && {
-                correctiveAction: updates.issueDetail.correctiveAction,
-              }),
-            },
-          },
-        }),
-
-        ...(updates.deliverableDetail && {
-          deliverableDetail: {
-            update: {
-              ...(updates.deliverableDetail.deliverableType && {
-                deliverableType: updates.deliverableDetail.deliverableType,
-              }),
-            },
-          },
-        }),
-      },
+      data: updateData, // ✅ casted / type-safe object
       include: {
         program: true,
         dueByMilestone: true,
@@ -280,15 +344,22 @@ export const editWorkItem = async (req: Request, res: Response): Promise<void> =
         authorUser: true,
         assigneeUser: true,
         comments: true,
+        partNumbers: { include: { partNumber: true } },
       },
     });
 
-    res.json(updatedWorkItem);
+    // 4️⃣ Flatten partNumberIds for frontend
+    res.json({
+      ...updatedWorkItem,
+      partNumberIds: updatedWorkItem.partNumbers.map((p) => p.partNumberId),
+    });
   } catch (error: any) {
     console.error("Error updating work item:", error);
     res.status(500).json({ message: `Error updating work item: ${error.message}` });
   }
 };
+
+
 
 /**
  * Delete WorkItem (and its subtype details)
