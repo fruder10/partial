@@ -19,6 +19,13 @@ export enum Status {
   Completed = "Completed",
 }
 
+export const StatusLabels: Record<Status, string> = {
+  [Status.ToDo]: "To Do",
+  [Status.WorkInProgress]: "Work In Progress",
+  [Status.UnderReview]: "Under Review",
+  [Status.Completed]: "Completed",
+};
+
 export enum DeliverableType {
   SystemSubsystemRequirementsSpecificationSRS = "SystemSubsystemRequirementsSpecificationSRS",
   InterfaceControlDocumentICD = "InterfaceControlDocumentICD",
@@ -265,6 +272,63 @@ export interface SearchResults {
   partNumbers?: PartNumber[];
 }
 
+export interface WorkItemCreateInput {
+  workItemType: WorkItemType;
+  title: string;
+  description?: string;
+  status: Status;
+  priority: Priority;
+  tags?: string;
+  dateOpened?: string;
+  dueDate: string;
+  estimatedCompletionDate: string;
+  actualCompletionDate?: string;
+  percentComplete?: number;
+  inputStatus?: string;
+  programId: number;
+  dueByMilestoneId: number;
+  authorUserId: number;
+  assignedUserId: number;
+  issueDetail?: {
+    issueType: IssueType;
+    rootCause?: string;
+    correctiveAction?: string;
+  };
+  deliverableDetail?: {
+    deliverableType: DeliverableType;
+  };
+  partNumberIds?: number[];
+}
+
+export interface WorkItemEditInput {
+  workItemType?: WorkItemType;
+  title?: string;
+  description?: string;
+  status?: Status;
+  priority?: Priority;
+  tags?: string;
+  dateOpened?: string;
+  dueDate?: string;
+  estimatedCompletionDate?: string;
+  actualCompletionDate?: string;
+  percentComplete?: number;
+  inputStatus?: string;
+  programId?: number;
+  dueByMilestoneId?: number;
+  authorUserId?: number;
+  assignedUserId?: number;
+  issueDetail?: {
+    issueType?: IssueType;
+    rootCause?: string;
+    correctiveAction?: string;
+  };
+  deliverableDetail?: {
+    deliverableType?: DeliverableType;
+  };
+  partNumberIds?: number[];
+}
+
+
 /* ===================
    API (RTK Query)
 =================== */
@@ -319,7 +383,7 @@ export const api = createApi({
                 : [{ type: "WorkItems", id: "LIST" }],
     }),
 
-    createWorkItem: build.mutation<WorkItem, Partial<WorkItem>>({
+    createWorkItem: build.mutation<WorkItem, WorkItemCreateInput>({
         query: (body) => ({
             url: "workItems",
             method: "POST",
@@ -344,7 +408,7 @@ export const api = createApi({
         ],
     }),
 
-    editWorkItem: build.mutation<WorkItem, { workItemId: number; updates: Partial<WorkItem> }>({
+    editWorkItem: build.mutation<WorkItem, { workItemId: number; updates: WorkItemEditInput }>({
         query: ({ workItemId, updates }) => ({
             url: `workItems/${workItemId}`,
             method: "PATCH",
@@ -389,15 +453,33 @@ export const api = createApi({
     /* ---------- PART NUMBERS ---------- */
     getParts: build.query<PartNumber[], void>({
       query: () => "partNumbers",
-      providesTags: ["PartNumbers"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: "PartNumbers" as const, id })),
+              { type: "PartNumbers", id: "LIST" },
+            ]
+          : [{ type: "PartNumbers", id: "LIST" }],
     }),
     getPartsByProgram: build.query<PartNumber[], { programId: number }>({
       query: ({ programId }) => `partNumbers?programId=${programId}`,
-      providesTags: ["PartNumbers"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: "PartNumbers" as const, id })),
+              { type: "PartNumbers", id: "LIST" },
+            ]
+          : [{ type: "PartNumbers", id: "LIST" }],
     }),
     getPartsByUser: build.query<PartNumber[], number>({
       query: (userId) => `partNumbers/user/${userId}`,
-      providesTags: ["PartNumbers"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: "PartNumbers" as const, id })),
+              { type: "PartNumbers", id: "LIST" },
+            ]
+          : [{ type: "PartNumbers", id: "LIST" }],
     }),
     createPart: build.mutation<PartNumber, Partial<PartNumber>>({
       query: (body) => ({
@@ -406,6 +488,27 @@ export const api = createApi({
         body,
       }),
       invalidatesTags: ["PartNumbers"],
+    }),
+    editPart: build.mutation<PartNumber, { partNumberId: number; updates: Partial<PartNumber> }>({
+      query: ({ partNumberId, updates }) => ({
+        url: `partNumbers/${partNumberId}`,
+        method: "PATCH",
+        body: updates,
+      }),
+      invalidatesTags: (result, error, { partNumberId }) => [
+        { type: "PartNumbers", id: partNumberId },
+        { type: "PartNumbers", id: "LIST" },
+      ],
+    }),
+    deletePart: build.mutation<void, number>({
+      query: (partNumberId) => ({
+        url: `partNumbers/${partNumberId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, partNumberId) => [
+        { type: "PartNumbers", id: partNumberId },
+        { type: "PartNumbers", id: "LIST" },
+      ],
     }),
 
     /* ---------- PROGRAMS ---------- */
@@ -470,6 +573,8 @@ export const {
   useGetPartsByProgramQuery,
   useGetPartsByUserQuery,
   useCreatePartMutation,
+  useEditPartMutation,
+  useDeletePartMutation,
 
   useGetProgramsQuery,
   useCreateProgramMutation,

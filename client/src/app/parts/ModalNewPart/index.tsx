@@ -1,5 +1,5 @@
 import Modal from '@/components/Modal';
-import { useCreatePartMutation } from '@/state/api';
+import { useCreatePartMutation, useGetUsersQuery, useGetProgramsQuery, useGetPartsQuery } from '@/state/api';
 import React, { useState } from 'react';
 //import { formatISO } from 'date-fns';
 
@@ -9,6 +9,9 @@ type Props = {
 };
 
 const ModalNewPart = ({isOpen, onClose}: Props) => {
+    const { data: users = [], isLoading: usersLoading } = useGetUsersQuery();
+    const { data: programs = [], isLoading: programsLoading } = useGetProgramsQuery();
+    const { data: parts = [], isLoading: partsLoading } = useGetPartsQuery();
     const [createPart, {isLoading}] = useCreatePartMutation();
     const [partNumber, setPartNumber] = useState("");
     const [partName, setPartName] = useState("");
@@ -91,27 +94,45 @@ const ModalNewPart = ({isOpen, onClose}: Props) => {
                     value={revisionLevel}
                     onChange={(e) => setRevisionLevel(e.target.value)}
                 />
-                <input
-                    type="number"
+                <select
                     className={inputStyles}
-                    placeholder="Assigned User Id"
                     value={assignedUserId}
                     onChange={(e) => setAssignedUserId(e.target.value)}
-                />
-                <input
-                    type="number"
+                    disabled={usersLoading}
+                >
+                    <option value="">Select Assigned User</option>
+                    {users.map((user) => (
+                        <option key={user.userId} value={user.userId}>
+                        {user.name} ({user.username})
+                        </option>
+                    ))}
+                </select>
+                <select
                     className={inputStyles}
-                    placeholder="Program Id"
                     value={programId}
                     onChange={(e) => setProgramId(e.target.value)}
-                />
-                <input
-                    type="number"
+                    disabled={programsLoading}
+                >
+                    <option value="">Select Program</option>
+                    {programs.map((program) => (
+                        <option key={program.id} value={program.id}>
+                        {program.name}
+                        </option>
+                    ))}
+                </select>
+                <select
                     className={inputStyles}
-                    placeholder="Parent Part Id"
                     value={parentId}
                     onChange={(e) => setParentId(e.target.value)}
-                />
+                    disabled={partsLoading}
+                >
+                    <option value="">Select Parent Part</option>
+                    {parts.map((part) => (
+                        <option key={part.id} value={part.id}>
+                        {part.number} - {part.partName}
+                        </option>
+                    ))}
+                </select>
                 {/* <textarea
                     className={inputStyles}
                     placeholder="Description"

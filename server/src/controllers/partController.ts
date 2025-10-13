@@ -92,3 +92,53 @@ export const createPart = async (
       .json({ message: `Error creating a part number: ${error.message}` });
   }
 };
+
+export const editPart = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { partNumberId } = req.params;
+  const updates = req.body; // Partial<PartNumber>
+
+  try {
+    const updatedPart = await prisma.partNumber.update({
+      where: { id: Number(partNumberId) },
+      data: {
+        number: updates.number,
+        partName: updates.partName,
+        level: updates.level,
+        state: updates.state,
+        revisionLevel: updates.revisionLevel,
+        assignedUserId: updates.assignedUserId,
+        programId: updates.programId,
+        parentId: updates.parentId ?? null,
+      },
+      include: {
+        assignedUser: true,
+        program: true,
+        parent: true,
+        children: true,
+      },
+    });
+
+    res.json(updatedPart);
+  } catch (error: any) {
+    console.error("Error updating part:", error);
+    res
+      .status(500)
+      .json({ message: `Error updating part: ${error.message}` });
+  }
+};
+
+export const deletePart = async (req: Request, res: Response): Promise<void> => {
+  const { partNumberId } = req.params;
+  try {
+    await prisma.partNumber.delete({
+      where: { id: Number(partNumberId) },
+    });
+    res.json({ message: "Part deleted successfully." });
+  } catch (error: any) {
+    res.status(500).json({ message: `Error deleting part: ${error.message}` });
+  }
+};
+
