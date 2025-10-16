@@ -4,7 +4,7 @@ import { useGetPartsByUserQuery } from "@/state/api";
 import React, { useState } from 'react';
 import PartHeader from "@/app/parts/PartHeader";
 import Board from '../BoardView';
-import List from '../ListView';
+import Burndown from '../BurndownView';
 import Timeline from '../TimelineView';
 import Table from '../TableView';
 import ModalNewWorkItem from '@/components/ModalNewWorkItem';
@@ -38,8 +38,8 @@ const Part = ({ params }: Props) => {
             { activeTab === "Board" && (
                 <Board id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} />
             )}
-            { activeTab === "List" && (
-                <List id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} />
+            { activeTab === "Burndown" && (
+                <Burndown id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} />
             )}
             { activeTab === "Timeline" && (
                 <Timeline id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} />
