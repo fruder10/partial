@@ -83,6 +83,8 @@ const HomePage = () => {
   const { data: teams, isLoading: isTeamsLoading } = useGetTeamsQuery();
 
   const [selectedWorkItemType, setSelectedWorkItemType] = useState<WorkItemType | "all">("all");
+  const [selectedPriority, setSelectedPriority] = useState<Priority | "all">(Priority.Urgent);
+
 
   // Conditionally choose which work item query to use
   const {
@@ -141,13 +143,17 @@ const HomePage = () => {
 
   const pieData = chartMode === "type" ? typeDistribution : priorityDistribution;
 
-  // 3️⃣ Urgent Work Items for the DataGrid
-  const urgentWorkItems = workItems.filter((item) => item.priority === Priority.Urgent)
-  .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
-  const urgentWorkItemsWithAssignee = urgentWorkItems.map(item => ({
-    ...item,
-    assigneeUserName: item.assigneeUser?.name || "Unassigned",
-  }));
+  // 3️⃣ Priority Work Items for the DataGrid (Urgent is default)
+  const filteredWorkItemsByPriority =
+    selectedPriority === "all"
+      ? workItems
+      : workItems.filter((item) => item.priority === selectedPriority);
+  const displayedWorkItems = [...filteredWorkItemsByPriority]
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+    .map((item) => ({
+      ...item,
+      assigneeUserName: item.assigneeUser?.name || "Unassigned",
+    }));
 
   // Work Items filtered by Type:
   const filteredWorkItemsForChart = 
@@ -157,6 +163,18 @@ const HomePage = () => {
 
   const formattedTeamName = (name: string) => 
     name.length > 10 ? name.slice(0, 10) + "…" : name;
+
+  // 📊 Priority counts for datagrid dropdown
+  const priorityCounts = workItems.reduce(
+    (acc: Record<string, number>, item: WorkItem) => {
+      acc[item.priority] = (acc[item.priority] || 0) + 1;
+      return acc;
+    },
+    {}
+  );
+
+  const totalCount = workItems.length;
+
 
   const chartColors = isDarkMode
     ? {
@@ -349,10 +367,28 @@ const HomePage = () => {
         
         {/* ---- Urgent Work Items DataGrid ---- */}
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-3">
-          <h3 className="mb-4 text-lg font-semibold dark:text-white">Urgent Work Items</h3>
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-lg font-semibold dark:text-white">
+              {selectedPriority === "all"
+                ? "All Work Items"
+                : `${selectedPriority} Priority Work Items`}
+            </h3>
+            <select
+              value={selectedPriority}
+              onChange={(e) => setSelectedPriority(e.target.value as Priority | "all")}
+              className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-dark-secondary dark:text-white"
+            >
+              <option value="all">All Priorities ({totalCount})</option>
+              {Object.values(Priority).map((priority) => (
+                <option key={priority} value={priority}>
+                  {priority} ({priorityCounts[priority] ?? 0})
+                </option>
+              ))}
+            </select>
+          </div>
           <div style={{ height: 400, width: "100%" }}>
             <DataGrid
-              rows={urgentWorkItemsWithAssignee}
+              rows={displayedWorkItems}
               columns={workItemColumns}
               checkboxSelection
               loading={isWorkItemsLoading}
