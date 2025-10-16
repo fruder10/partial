@@ -1,5 +1,5 @@
 import Header from '@/components/Header';
-import { Clock, Filter, Grid3x3, List, PlusSquare, Share2, SquarePen, Table } from 'lucide-react';
+import { Filter, Grid3x3, TrendingDown, PlusSquare, Share2, SquarePen, Table, SquareChartGantt } from 'lucide-react';
 import React, { useState } from 'react';
 import ModalNewPart from "./ModalNewPart";
 import ModalEditPart from "./ModalEditPart";
@@ -12,7 +12,7 @@ type Props = {
 };
 
 const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
-    const [isModalNewPartOpen, setIsModalNewPartOpen] = useState(false); // MODAL IS THE + BUTTON TO ADD A NEW PART
+    const [isModalNewPartOpen, setIsModalNewPartOpen] = useState(false); 
     const [isModalEditPartOpen, setIsModalEditPartOpen] = useState(false);
     const headerTitle = activePart
         ? `${activePart.number} - ${activePart.partName}: Tasks, Deliverables, and Issues`
@@ -63,14 +63,14 @@ const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
                         activeTab={activeTab}
                     />
                     <TabButton
-                        name="List"
-                        icon={<List className="h-5 w-5" />}
+                        name="Burndown"
+                        icon={<TrendingDown className="h-5 w-5" />}
                         setActiveTab={setActiveTab}
                         activeTab={activeTab}
                     />
                     <TabButton
                         name="Timeline"
-                        icon={<Clock className="h-5 w-5" />}
+                        icon={<SquareChartGantt className="h-5 w-5" />}
                         setActiveTab={setActiveTab}
                         activeTab={activeTab}
                     />
