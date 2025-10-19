@@ -84,6 +84,7 @@ const HomePage = () => {
 
   const [selectedWorkItemType, setSelectedWorkItemType] = useState<WorkItemType | "all">("all");
   const [selectedPriority, setSelectedPriority] = useState<Priority | "all">(Priority.Urgent);
+  const [workItemFilter, setWorkItemFilter] = useState<"all" | "open">("all");
 
 
   // Conditionally choose which work item query to use
@@ -119,8 +120,13 @@ const HomePage = () => {
 
   /* ---------- DATA TRANSFORMS ---------- */
 
+  // First, apply the work item filter (all vs open) to all data
+  const filteredWorkItems = workItemFilter === "open"
+    ? workItems.filter((item) => item.status !== "Completed")
+    : workItems;
+
   // 1️⃣ Work Items by Discipline Team
-  const teamCount = workItems.reduce((acc: Record<string, number>, item: WorkItem) => {
+  const teamCount = filteredWorkItems.reduce((acc: Record<string, number>, item: WorkItem) => {
     const team = teams.find((t) => t.id === item.assigneeUser?.disciplineTeamId);
     const teamName = team?.name || "Unassigned";
     acc[teamName] = (acc[teamName] || 0) + 1;
@@ -129,13 +135,13 @@ const HomePage = () => {
   const teamDistribution = Object.entries(teamCount).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
 
   // 2️⃣ Pie chart data: Type vs Priority
-  const priorityCount = workItems.reduce((acc: Record<string, number>, item: WorkItem) => {
+  const priorityCount = filteredWorkItems.reduce((acc: Record<string, number>, item: WorkItem) => {
     acc[item.priority] = (acc[item.priority] || 0) + 1;
     return acc;
   }, {});
   const priorityDistribution = Object.entries(priorityCount).map(([name, count]) => ({ name, count }));
 
-  const typeCount = workItems.reduce((acc: Record<string, number>, item: WorkItem) => {
+  const typeCount = filteredWorkItems.reduce((acc: Record<string, number>, item: WorkItem) => {
     acc[item.workItemType] = (acc[item.workItemType] || 0) + 1;
     return acc;
   }, {});
@@ -146,8 +152,9 @@ const HomePage = () => {
   // 3️⃣ Priority Work Items for the DataGrid (Urgent is default)
   const filteredWorkItemsByPriority =
     selectedPriority === "all"
-      ? workItems
-      : workItems.filter((item) => item.priority === selectedPriority);
+      ? filteredWorkItems
+      : filteredWorkItems.filter((item) => item.priority === selectedPriority);
+  
   const displayedWorkItems = [...filteredWorkItemsByPriority]
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
     .map((item) => ({
@@ -155,7 +162,7 @@ const HomePage = () => {
       assigneeUserName: item.assigneeUser?.name || "Unassigned",
     }));
 
-  // Work Items filtered by Type:
+  // Work Items filtered by Type (for Burndown Chart - uses all work items, not filtered by status):
   const filteredWorkItemsForChart = 
   selectedWorkItemType === "all"
     ? workItems
@@ -165,7 +172,7 @@ const HomePage = () => {
     name.length > 10 ? name.slice(0, 10) + "…" : name;
 
   // 📊 Priority counts for datagrid dropdown
-  const priorityCounts = workItems.reduce(
+  const priorityCounts = filteredWorkItems.reduce(
     (acc: Record<string, number>, item: WorkItem) => {
       acc[item.priority] = (acc[item.priority] || 0) + 1;
       return acc;
@@ -173,7 +180,7 @@ const HomePage = () => {
     {}
   );
 
-  const totalCount = workItems.length;
+  const totalCount = filteredWorkItems.length;
 
 
   const chartColors = isDarkMode
@@ -194,27 +201,52 @@ const HomePage = () => {
     <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
       <Header name="Program Management Dashboard" />
 
-      {/* ---- Program Selector ---- */}
-      <div className="mb-6 flex items-center gap-4">
-        <label htmlFor="program-select" className="font-semibold dark:text-white">
-          Select Program:
-        </label>
-        <select
-          id="program-select"
-          className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:bg-dark-secondary dark:text-white"
-          value={selectedProgramId}
-          onChange={(e) => {
-            const value = e.target.value;
-            setSelectedProgramId(value === "all" ? "all" : parseInt(value));
-          }}
-        >
-          <option value="all">All Programs</option>
-          {programs.map((program) => (
-            <option key={program.id} value={program.id}>
-              {program.name}
-            </option>
-          ))}
-        </select>
+      {/* ---- Program Selector and Work Item Filter ---- */}
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4">
+          <select
+            id="program-select"
+            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:bg-dark-secondary dark:text-white"
+            value={selectedProgramId}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSelectedProgramId(value === "all" ? "all" : parseInt(value));
+            }}
+          >
+            <option value="all">All Programs</option>
+            {programs.map((program) => (
+              <option key={program.id} value={program.id}>
+                {program.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Work Item Status Toggle */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-50 p-1 dark:border-gray-600 dark:bg-dark-tertiary">
+            <button
+              onClick={() => setWorkItemFilter("all")}
+              className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                workItemFilter === "all"
+                  ? "bg-white text-blue-600 shadow-sm dark:bg-dark-secondary dark:text-blue-400"
+                  : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+              }`}
+            >
+              All Work Items
+            </button>
+            <button
+              onClick={() => setWorkItemFilter("open")}
+              className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                workItemFilter === "open"
+                  ? "bg-white text-blue-600 shadow-sm dark:bg-dark-secondary dark:text-blue-400"
+                  : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+              }`}
+            >
+              Open Work Items
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* ---- Charts and Table ---- */}
@@ -298,7 +330,7 @@ const HomePage = () => {
                 </thead>
                 <tbody>
                   {displayedMilestones?.map((milestone) => {
-                    const milestoneWorkItems = workItems?.filter(
+                    const milestoneWorkItems = filteredWorkItems?.filter(
                       (wi) => wi.dueByMilestoneId === milestone.id
                     );
                     const programName =
