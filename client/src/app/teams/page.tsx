@@ -1,5 +1,5 @@
 "use client";
-import { useGetTeamsQuery, useGetUsersQuery, useGetWorkItemsQuery, WorkItemType, Priority, WorkItem } from "@/state/api";
+import { useGetTeamsQuery, useGetUsersQuery, useGetWorkItemsQuery, WorkItemType, Priority, WorkItem, Status } from "@/state/api";
 import React, { useMemo, useState } from "react";
 import { useAppSelector } from "../redux";
 import Header from "@/components/Header";
@@ -26,44 +26,135 @@ import { format } from "date-fns";
 
 const COLORS = ["#6FA8DC", "#66CDAA", "#FF9500", "#FF8042", "#A28FD0", "#FF6384", "#36A2EB"];
 
+const getStatusColor = (status: Status) => {
+  switch (status) {
+    case Status.ToDo:
+      return "bg-gray-100 text-gray-800";
+    case Status.WorkInProgress:
+      return "bg-blue-100 text-blue-800";
+    case Status.UnderReview:
+      return "bg-yellow-100 text-yellow-800";
+    case Status.Completed:
+      return "bg-green-100 text-green-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
+const getPriorityColor = (priority: Priority) => {
+  switch (priority) {
+    case Priority.Urgent:
+      return "bg-red-100 text-red-800";
+    case Priority.High:
+      return "bg-orange-100 text-orange-800";
+    case Priority.Medium:
+      return "bg-yellow-100 text-yellow-800";
+    case Priority.Low:
+      return "bg-green-100 text-green-800";
+    case Priority.Backlog:
+      return "bg-gray-100 text-gray-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  return date.toLocaleDateString();
+};
+
 const workItemColumns: GridColDef<WorkItem>[] = [
-  { field: "workItemType", headerName: "Type", width: 100 },
-  { field: "title", headerName: "Title", width: 200 },
-  { field: "status", headerName: "Status", width: 100 },
-  { field: "priority", headerName: "Priority", width: 75 },
-  { field: "dueDate", 
+  { 
+    field: "workItemType", 
+    headerName: "Type", 
+    width: 120,
+    renderCell: (params) => (
+      <span className="inline-flex rounded-full bg-purple-100 px-2 text-xs font-semibold leading-5 text-purple-800">
+        {params.value}
+      </span>
+    ),
+  },
+  { 
+    field: "title", 
+    headerName: "Title", 
+    minWidth: 200,
+    flex: 1,
+  },
+  { 
+    field: "status", 
+    headerName: "Status", 
+    width: 140,
+    renderCell: (params) => (
+      <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${getStatusColor(params.value)}`}>
+        {params.value}
+      </span>
+    ),
+  },
+  { 
+    field: "priority", 
+    headerName: "Priority", 
+    width: 110,
+    renderCell: (params) => (
+      <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${getPriorityColor(params.value)}`}>
+        {params.value}
+      </span>
+    ),
+  },
+  { 
+    field: "dueDate", 
     headerName: "Due Date",
-    width: 100,
+    width: 120,
     renderCell: (params) => {
-      if (!params.value) return "";
-      const date = new Date(params.value);
-      const formatted = format(date, "MMM d, yyyy");
-      const isOverdue = date < new Date();
+      const dateStr = formatDate(params.value);
+      const isPastDue = params.value && new Date(params.value) < new Date();
+      const isNotCompleted = params.row.status !== Status.Completed;
+      const shouldHighlight = isPastDue && isNotCompleted;
+      
       return (
-        <span style={{ color: isOverdue ? "red" : "inherit" }}>
-          {formatted}
-        </span>
-      );
-    },
-   },
-  { field: "estimatedCompletionDate",
-    headerName: "ECD",
-    width: 100,
-    renderCell: (params) => {
-      if (!params.value) return "";
-      const date = new Date(params.value);
-      const formatted = format(date, "MMM d, yyyy");
-      const isOverdue = date < new Date();
-      return (
-        <span style={{ color: isOverdue ? "red" : "inherit" }}>
-          {formatted}
+        <span className={shouldHighlight ? "text-red-600 font-semibold" : ""}>
+          {dateStr}
         </span>
       );
     },
   },
-  { field: "percentComplete", headerName: "Percent Complete", width: 120 },
-  { field: "inputStatus", headerName: "Current Status", width: 300 },
-  { field: "assigneeUserName", headerName: "Assignee", width: 150 },
+  { 
+    field: "estimatedCompletionDate",
+    headerName: "ECD",
+    width: 130,
+    renderCell: (params) => {
+      const dateStr = formatDate(params.value);
+      const isPastDue = params.value && new Date(params.value) < new Date();
+      const isNotCompleted = params.row.status !== Status.Completed;
+      const shouldHighlight = isPastDue && isNotCompleted;
+      
+      return (
+        <span className={shouldHighlight ? "text-red-600 font-semibold" : ""}>
+          {dateStr}
+        </span>
+      );
+    },
+  },
+  { 
+    field: "percentComplete", 
+    headerName: "% Complete", 
+    width: 110,
+    renderCell: (params) => (
+      <span className="font-medium">{params.value ?? 0}%</span>
+    ),
+  },
+  { 
+    field: "inputStatus", 
+    headerName: "Input Status", 
+    width: 200,
+    renderCell: (params) => params.value || "N/A",
+  },
+  { 
+    field: "assigneeUserName", 
+    headerName: "Assignee", 
+    width: 150,
+    renderCell: (params) => params.value || "Unassigned",
+  },
 ];
 
 const Teams = () => {

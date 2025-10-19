@@ -1,5 +1,5 @@
 import Modal from '@/components/Modal';
-import { useCreatePartMutation, useGetUsersQuery, useGetProgramsQuery, useGetPartsQuery } from '@/state/api';
+import { useCreatePartMutation, useGetUsersQuery, useGetProgramsQuery, useGetPartsQuery, PartState, PartStateLabels } from '@/state/api';
 import React, { useState } from 'react';
 //import { formatISO } from 'date-fns';
 
@@ -16,7 +16,7 @@ const ModalNewPart = ({isOpen, onClose}: Props) => {
     const [partNumber, setPartNumber] = useState("");
     const [partName, setPartName] = useState("");
     const [level, setLevel] = useState("");
-    const [state, setState] = useState("");
+    const [state, setState] = useState<PartState | "">("");
     const [revisionLevel, setRevisionLevel] = useState("");
     const [assignedUserId, setAssignedUserId] = useState("");
     const [programId, setProgramId] = useState("");
@@ -80,13 +80,18 @@ const ModalNewPart = ({isOpen, onClose}: Props) => {
                     value={level}
                     onChange={(e) => setLevel(e.target.value)}
                 />
-                <input
-                    type="text"
+                <select
                     className={inputStyles}
-                    placeholder="State"
                     value={state}
-                    onChange={(e) => setState(e.target.value)}
-                />
+                    onChange={(e) => setState(e.target.value as PartState)}
+                >
+                    <option value="">Select State</option>
+                    {Object.values(PartState).map((stateValue) => (
+                        <option key={stateValue} value={stateValue}>
+                            {PartStateLabels[stateValue]}
+                        </option>
+                    ))}
+                </select>
                 <input
                     type="text"
                     className={inputStyles}

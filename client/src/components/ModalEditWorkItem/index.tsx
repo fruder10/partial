@@ -106,12 +106,12 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
       const assignedUser = users.find((u) => u.userId === workItem.assignedUserId);
       setAssignedUserName(assignedUser?.name || "");
 
-      if (workItem.workItemType === WorkItemType.Issue && workItem.issueDetail) {
-        setIssueType(workItem.issueDetail.issueType || "");
-        setRootCause(workItem.issueDetail.rootCause || "");
-        setCorrectiveAction(workItem.issueDetail.correctiveAction || "");
-      } else if (workItem.workItemType === WorkItemType.Deliverable && workItem.deliverableDetail) {
-        setDeliverableType(workItem.deliverableDetail.deliverableType || "");
+      if (workItem.workItemType === WorkItemType.Issue) {
+        setIssueType(workItem.issueDetail?.issueType || "");
+        setRootCause(workItem.issueDetail?.rootCause || "");
+        setCorrectiveAction(workItem.issueDetail?.correctiveAction || "");
+      } else if (workItem.workItemType === WorkItemType.Deliverable) {
+        setDeliverableType(workItem.deliverableDetail?.deliverableType || "");
       }
     }
   }, [workItem, programs, milestones, users]);
@@ -155,14 +155,14 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
       dueByMilestoneId: parseInt(dueByMilestoneId),
       authorUserId: parseInt(authorUserId),
       assignedUserId: parseInt(assignedUserId),
-      issueDetail: workItemType === WorkItemType.Issue
+      issueDetail: workItemType === WorkItemType.Issue && issueType
         ? {
             issueType: issueType as IssueType,
             rootCause,
             correctiveAction,
           }
         : undefined,
-      deliverableDetail: workItemType === WorkItemType.Deliverable
+      deliverableDetail: workItemType === WorkItemType.Deliverable && deliverableType
         ? {
             deliverableType: deliverableType as DeliverableType,
           }
@@ -175,8 +175,9 @@ const ModalEditWorkItem = ({ isOpen, onClose, workItem }: Props) => {
             updates: updatedWorkItem,
         }).unwrap();
         onClose(); // close modal on success
-    } catch (err) {
+    } catch (err: any) {
         console.error("Failed to save work item:", err);
+        alert(`Failed to save work item: ${err?.data?.message || err?.message || 'Unknown error'}`);
     }
   };
 

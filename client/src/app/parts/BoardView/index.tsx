@@ -226,8 +226,8 @@ const WorkItem = ({ workItem, setEditingWorkItem }: WorkItemProps) => {
                 <div className="my-3 flex justify-between">
                     <h4 className="text-md font-bold dark:text-white">{workItem.workItemType}: {workItem.title}</h4>
                     {typeof workItem.percentComplete === "number" && (
-                        <div className="text-xs font-semibold dark:text-white">
-                            {workItem.percentComplete} %
+                        <div className="whitespace-nowrap text-xs font-semibold dark:text-white">
+                            {workItem.percentComplete}%
                         </div>
                     )}
                 </div>

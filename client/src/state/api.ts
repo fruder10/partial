@@ -89,17 +89,17 @@ export const DeliverableTypeLabels: Record<DeliverableType, string> = {
 export enum IssueType {
   Defect = "Defect",
   Failure = "Failure",
-  RequirementWaiver = "Requirement Waiver",
-  NonConformanceReportNCR = "Non-Conformance Report (NCR)",
-  ProcessManufacturingIssue = "Process / Manufacturing Issue",
-  SupplyChainProcurementIssue = "Supply-Chain / Procurement Issue",
-  IntegrationInterfaceIssue = "Integration / Interface Issue",
-  TestVerificationAnomaly = "Test / Verification Anomaly",
-  EnvironmentalReliabilityIssue = "Environmental / Reliability Issue",
-  ConfigurationDocumentationControlIssue = "Configuration / Documentation Control Issue",
-  SafetyRegulatoryIssue = "Safety / Regulatory Issue",
-  ProgrammaticRiskItem = "Programmatic / Risk Item",
-  ObsolescenceEndOfLifeIssue = "Obsolescence / End-of-Life Issue",
+  RequirementWaiver = "RequirementWaiver",
+  NonConformanceReportNCR = "NonConformanceReportNCR",
+  ProcessManufacturingIssue = "ProcessManufacturingIssue",
+  SupplyChainProcurementIssue = "SupplyChainProcurementIssue",
+  IntegrationInterfaceIssue = "IntegrationInterfaceIssue",
+  TestVerificationAnomaly = "TestVerificationAnomaly",
+  EnvironmentalReliabilityIssue = "EnvironmentalReliabilityIssue",
+  ConfigurationDocumentationControlIssue = "ConfigurationDocumentationControlIssue",
+  SafetyRegulatoryIssue = "SafetyRegulatoryIssue",
+  ProgrammaticRiskItem = "ProgrammaticRiskItem",
+  ObsolescenceEndOfLifeIssue = "ObsolescenceEndOfLifeIssue",
   Other = "Other",
 }
 
@@ -173,12 +173,26 @@ export interface Milestone {
   workItems?: WorkItem[];
 }
 
+export enum PartState {
+  Released = "Released",
+  UnderReview = "UnderReview",
+  InWork = "InWork",
+  Implementation = "Implementation",
+}
+
+export const PartStateLabels: Record<PartState, string> = {
+  [PartState.Released]: "Released",
+  [PartState.UnderReview]: "Under Review",
+  [PartState.InWork]: "In Work",
+  [PartState.Implementation]: "Implementation",
+};
+
 export interface PartNumber {
   id: number;
   number: number;
   partName: string;
   level: number;
-  state: string;
+  state: PartState;
   revisionLevel: string;
   assignedUserId: number;
   programId: number;
