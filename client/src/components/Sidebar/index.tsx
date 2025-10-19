@@ -112,7 +112,7 @@ const Sidebar = () => {
                     <Image src="/logo1.png" alt="Logo" width={40} height={40} />
                     <div>
                         <h3 className="text-md font-bold tracking-wide dark:text-gray-200">
-                            COMPANY NAME
+                            Partial Team
                         </h3>
                         <div className="mt-1 flex items-start gap-2">
                             <LockIcon className="mt-[0.1rem] h-3 w-3 text-gray-500 dark:text-gray-400" />
@@ -124,11 +124,11 @@ const Sidebar = () => {
                 {/* NAVBAR LINKS */}
                 <nav className="z-10 w-full">
                     <SidebarLink icon={Home} label="Home" href="/" />
-                    <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
                     <SidebarLink icon={Search} label="Search" href="/search" />
-                    <SidebarLink icon={Settings} label="Settings" href="/settings" />
+                    <SidebarLink icon={Briefcase} label="Program Timeline" href="/timeline" />
                     <SidebarLink icon={User} label="Users" href="/users" />
                     <SidebarLink icon={Users} label="Teams" href="/teams" />
+                    <SidebarLink icon={Settings} label="Settings" href="/settings" />
                 </nav>
 
                 {/* ===== My Programs top-level toggle ===== */}

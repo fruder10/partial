@@ -259,6 +259,8 @@ export interface DisciplineTeam {
   name: string;
   description: string;
   teamManagerUserId?: number;
+  teamManagerUsername?: string;
+  teamManagerName?: string;
 
   users?: User[];
   programs?: Program[];
