@@ -219,30 +219,59 @@ const HomePage = () => {
 
       {/* ---- Charts and Table ---- */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {/* ---- Burndown Chart: Work Items — spans 2 columns ---- */}
-        <div className="col-span-3 md:col-span-2 row-span-1">
+        {/* ---- Bar Chart and Pie Chart sit on first row ---- */}
+        <div className="col-span-3 md:col-span-2 grid grid-cols-2 gap-4">
+          {/* ---- Bar Chart: Work Items by Discipline Team ---- */}
+          <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
+            <h3 className="mb-4 text-lg font-semibold dark:text-white">
+              Work Items by Discipline Team
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={teamDistribution}>
+                <CartesianGrid strokeDasharray="3 3" stroke={chartColors.barGrid} />
+                <XAxis 
+                  dataKey="name"
+                  tickFormatter={formattedTeamName}
+                  stroke={chartColors.text}
+                  interval={0}
+                />
+                <YAxis stroke={chartColors.text} />
+                <Tooltip />
+                <Bar dataKey="count" fill={chartColors.bar}>
+                  {teamDistribution.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* ---- Pie Chart: Type vs Priority ---- */}
           <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="mb-4 text-lg font-semibold dark:text-white">
-                Work Item Burndown
+              <h3 className="text-lg font-semibold dark:text-white">
+                Work Item Distribution (By Type / By Priority)
               </h3>
               <select
+                value={chartMode}
+                onChange={(e) => setChartMode(e.target.value as "type" | "priority")}
                 className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-dark-secondary dark:text-white"
-                value={selectedWorkItemType}
-                onChange={(e) => {
-                  const value = e.target.value as WorkItemType | "all";
-                  setSelectedWorkItemType(value);
-                }}
               >
-                <option value="all">All Types</option>
-                {Object.values(WorkItemType).map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
+                <option value="type">By Type</option>
+                <option value="priority">By Priority</option>
               </select>
             </div>
-            <BurndownChart workItems={filteredWorkItemsForChart} isDarkMode={isDarkMode} />
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie dataKey="count" data={pieData} fill={chartColors.pieFill} label>
+                  {pieData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
@@ -308,60 +337,30 @@ const HomePage = () => {
           </div>
         </div>
 
-        
-        {/* ---- Bar Chart and Pie Chart sit on second row across 2 columns ---- */}
-        <div className="col-span-3 md:col-span-2 grid grid-cols-2 gap-4">
-          {/* ---- Bar Chart: Work Items by Discipline Team ---- */}
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
-            <h3 className="mb-4 text-lg font-semibold dark:text-white">
-              Work Items by Discipline Team
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={teamDistribution}>
-                <CartesianGrid strokeDasharray="3 3" stroke={chartColors.barGrid} />
-                <XAxis 
-                  dataKey="name"
-                  tickFormatter={formattedTeamName}
-                  stroke={chartColors.text}
-                  interval={0}
-                />
-                <YAxis stroke={chartColors.text} />
-                <Tooltip />
-                <Bar dataKey="count" fill={chartColors.bar}>
-                  {teamDistribution.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* ---- Pie Chart: Type vs Priority ---- */}
+        {/* ---- Burndown Chart: Work Items — spans 2 columns ---- */}
+        <div className="col-span-3 md:col-span-2">
           <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold dark:text-white">
-                Work Item Distribution (By Type / By Priority)
+              <h3 className="mb-4 text-lg font-semibold dark:text-white">
+                Work Item Burndown
               </h3>
               <select
-                value={chartMode}
-                onChange={(e) => setChartMode(e.target.value as "type" | "priority")}
                 className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-dark-secondary dark:text-white"
+                value={selectedWorkItemType}
+                onChange={(e) => {
+                  const value = e.target.value as WorkItemType | "all";
+                  setSelectedWorkItemType(value);
+                }}
               >
-                <option value="type">By Type</option>
-                <option value="priority">By Priority</option>
+                <option value="all">All Types</option>
+                {Object.values(WorkItemType).map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
               </select>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie dataKey="count" data={pieData} fill={chartColors.pieFill} label>
-                  {pieData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            <BurndownChart workItems={filteredWorkItemsForChart} isDarkMode={isDarkMode} />
           </div>
         </div>
         
@@ -386,7 +385,7 @@ const HomePage = () => {
               ))}
             </select>
           </div>
-          <div style={{ height: 400, width: "100%" }}>
+          <div style={{ height: 650, width: "100%" }}>
             <DataGrid
               rows={displayedWorkItems}
               columns={workItemColumns}
@@ -395,6 +394,7 @@ const HomePage = () => {
               getRowClassName={() => "data-grid-row"}
               getCellClassName={() => "data-grid-cell"}
               className={dataGridClassNames}
+              showToolbar
               sx={dataGridSxStyles(isDarkMode)}
               initialState={{
                 sorting: {

@@ -96,6 +96,7 @@ const TableView = ({ id, setIsModalNewWorkItemOpen }: Props) => {
         rows={workItems || []}
         columns={columns}
         className={dataGridClassNames}
+        showToolbar
         sx={dataGridSxStyles(isDarkMode)}
       />
     </div>
