@@ -8,7 +8,11 @@ export const getUsers = async (
   res: Response
 ): Promise<void> => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      include: {
+        disciplineTeam: true,
+      },
+    });
     res.json(users);
   } catch (error: any) {
     res

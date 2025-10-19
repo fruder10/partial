@@ -1,5 +1,5 @@
 import Header from '@/components/Header';
-import { Filter, Grid3x3, TrendingDown, PlusSquare, Share2, SquarePen, Table, SquareChartGantt } from 'lucide-react';
+import { Filter, SquareKanban, Grid3x3, TrendingDown, PlusSquare, Share2, SquarePen, Table, SquareChartGantt } from 'lucide-react';
 import React, { useState } from 'react';
 import ModalNewPart from "./ModalNewPart";
 import ModalEditPart from "./ModalEditPart";
@@ -58,7 +58,7 @@ const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
                 <div className="flex flex-1 items-center gap-2 md:gap-4">
                     <TabButton
                         name="Board"
-                        icon={<Grid3x3 className="h-5 w-5" />}
+                        icon={<SquareKanban className="h-5 w-5" />}
                         setActiveTab={setActiveTab}
                         activeTab={activeTab}
                     />
