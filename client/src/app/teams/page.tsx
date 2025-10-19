@@ -71,6 +71,7 @@ const Teams = () => {
   const [chartMode, setChartMode] = useState<"type" | "priority">("type");
   const [selectedWorkItemType, setSelectedWorkItemType] = useState<WorkItemType | "all">("all");
   const [selectedPriority, setSelectedPriority] = useState<Priority | "all">(Priority.Urgent);
+  const [workItemFilter, setWorkItemFilter] = useState<"all" | "open">("all");
   
   const { data: teams, isLoading, isError } = useGetTeamsQuery();
   const { data: users } = useGetUsersQuery();
@@ -92,8 +93,16 @@ const Teams = () => {
     });
   }, [workItems, users, selectedTeamId]);
 
-  // Filter work items by type for burndown chart
+  // Apply work item filter (all vs open)
   const filteredTeamWorkItems = useMemo(() => {
+    if (workItemFilter === "open") {
+      return teamWorkItems.filter((item) => item.status !== "Completed");
+    }
+    return teamWorkItems;
+  }, [teamWorkItems, workItemFilter]);
+
+  // Filter work items by type for burndown chart (uses all team work items, not filtered by status)
+  const filteredTeamWorkItemsForBurndown = useMemo(() => {
     if (selectedWorkItemType === "all") return teamWorkItems;
     return teamWorkItems.filter((item) => item.workItemType === selectedWorkItemType);
   }, [teamWorkItems, selectedWorkItemType]);
@@ -103,7 +112,7 @@ const Teams = () => {
     if (!teamMembers.length) return [];
     
     const counts = teamMembers.map((member) => {
-      const count = teamWorkItems.filter((item) => item.assignedUserId === member.userId).length;
+      const count = filteredTeamWorkItems.filter((item) => item.assignedUserId === member.userId).length;
       return {
         name: member.name,
         count,
@@ -111,43 +120,43 @@ const Teams = () => {
     });
 
     return counts.sort((a, b) => b.count - a.count);
-  }, [teamWorkItems, teamMembers]);
+  }, [filteredTeamWorkItems, teamMembers]);
 
   // Pie chart data: Type vs Priority
   const priorityCount = useMemo(() => {
     const count: Record<string, number> = {};
-    teamWorkItems.forEach((item) => {
+    filteredTeamWorkItems.forEach((item) => {
       count[item.priority] = (count[item.priority] || 0) + 1;
     });
     return Object.entries(count).map(([name, count]) => ({ name, count }));
-  }, [teamWorkItems]);
+  }, [filteredTeamWorkItems]);
 
   const typeCount = useMemo(() => {
     const count: Record<string, number> = {};
-    teamWorkItems.forEach((item) => {
+    filteredTeamWorkItems.forEach((item) => {
       count[item.workItemType] = (count[item.workItemType] || 0) + 1;
     });
     return Object.entries(count).map(([name, count]) => ({ name, count }));
-  }, [teamWorkItems]);
+  }, [filteredTeamWorkItems]);
 
   const pieData = chartMode === "type" ? typeCount : priorityCount;
 
   // Priority counts for datagrid dropdown
   const priorityCounts = useMemo(() => {
     const count: Record<string, number> = {};
-    teamWorkItems.forEach((item) => {
+    filteredTeamWorkItems.forEach((item) => {
       count[item.priority] = (count[item.priority] || 0) + 1;
     });
     return count;
-  }, [teamWorkItems]);
+  }, [filteredTeamWorkItems]);
 
-  const totalCount = teamWorkItems.length;
+  const totalCount = filteredTeamWorkItems.length;
 
   // Priority Work Items for the DataGrid
   const filteredWorkItemsByPriority = useMemo(() => {
-    if (selectedPriority === "all") return teamWorkItems;
-    return teamWorkItems.filter((item) => item.priority === selectedPriority);
-  }, [teamWorkItems, selectedPriority]);
+    if (selectedPriority === "all") return filteredTeamWorkItems;
+    return filteredTeamWorkItems.filter((item) => item.priority === selectedPriority);
+  }, [filteredTeamWorkItems, selectedPriority]);
 
   const displayedWorkItems = useMemo(() => {
     return [...filteredWorkItemsByPriority]
@@ -222,27 +231,54 @@ const Teams = () => {
         </div>
       </div>
 
-      {/* Team Selector */}
-      <div className="mb-6 flex items-center gap-4">
-        <label htmlFor="team-select" className="font-semibold dark:text-white">
-          Select Discipline Team:
-        </label>
-        <select
-          id="team-select"
-          className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:bg-dark-secondary dark:text-white"
-          value={selectedTeamId}
-          onChange={(e) => {
-            const value = e.target.value;
-            setSelectedTeamId(value === "all" ? "all" : parseInt(value));
-          }}
-        >
-          <option value="all">All Teams</option>
-          {teams?.map((team) => (
-            <option key={team.id} value={team.id}>
-              {team.name}
-            </option>
-          ))}
-        </select>
+      {/* Team Selector and Work Item Filter */}
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4">
+          <select
+            id="team-select"
+            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:bg-dark-secondary dark:text-white"
+            value={selectedTeamId}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSelectedTeamId(value === "all" ? "all" : parseInt(value));
+            }}
+          >
+            <option value="all">Select Discipline Team</option>
+            {teams?.map((team) => (
+              <option key={team.id} value={team.id}>
+                {team.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Work Item Status Toggle */}
+        {selectedTeamId !== "all" && (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-50 p-1 dark:border-gray-600 dark:bg-dark-tertiary">
+              <button
+                onClick={() => setWorkItemFilter("all")}
+                className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                  workItemFilter === "all"
+                    ? "bg-white text-blue-600 shadow-sm dark:bg-dark-secondary dark:text-blue-400"
+                    : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                }`}
+              >
+                All Work Items
+              </button>
+              <button
+                onClick={() => setWorkItemFilter("open")}
+                className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                  workItemFilter === "open"
+                    ? "bg-white text-blue-600 shadow-sm dark:bg-dark-secondary dark:text-blue-400"
+                    : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                }`}
+              >
+                Open Work Items
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Team Members Work Items Bar Chart and Pie Chart */}
@@ -328,7 +364,7 @@ const Teams = () => {
               ))}
             </select>
           </div>
-          <BurndownChart workItems={filteredTeamWorkItems} isDarkMode={isDarkMode} />
+          <BurndownChart workItems={filteredTeamWorkItemsForBurndown} isDarkMode={isDarkMode} />
         </div>
       )}
 
