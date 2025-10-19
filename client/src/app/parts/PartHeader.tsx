@@ -3,7 +3,7 @@ import { Filter, SquareKanban, Grid3x3, TrendingDown, PlusSquare, Share2, Square
 import React, { useState } from 'react';
 import ModalNewPart from "./ModalNewPart";
 import ModalEditPart from "./ModalEditPart";
-import { PartNumber } from '@/state/api';
+import { PartNumber, useGetUsersQuery } from '@/state/api';
 
 type Props = {
     activeTab: string;
@@ -14,9 +14,15 @@ type Props = {
 const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
     const [isModalNewPartOpen, setIsModalNewPartOpen] = useState(false); 
     const [isModalEditPartOpen, setIsModalEditPartOpen] = useState(false);
+    const { data: users = [] } = useGetUsersQuery();
+    
     const headerTitle = activePart
-        ? `${activePart.number} - ${activePart.partName}: Tasks, Deliverables, and Issues`
-        : "My Part's Tasks, Deliverables, and Issues";
+        ? `${activePart.number} - ${activePart.partName}: Work Items (Tasks, Deliverables, and Issues)`
+        : "My Part's Work Items (Tasks, Deliverables, and Issues)";
+    
+    const assignedUser = activePart?.assignedUserId 
+        ? users.find(user => user.userId === activePart.assignedUserId)
+        : null;
     
     return (
         <div className="px-4 xl:px-6">
@@ -51,6 +57,11 @@ const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
                         </div>
                     }
                 />
+                {activePart && (
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        Assignee: {assignedUser?.name || 'Unassigned'}
+                    </p>
+                )}
             </div>
 
             {/* TABS */}
@@ -63,6 +74,12 @@ const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
                         activeTab={activeTab}
                     />
                     <TabButton
+                        name="Table"
+                        icon={<Table className="h-5 w-5" />}
+                        setActiveTab={setActiveTab}
+                        activeTab={activeTab}
+                    />
+                    <TabButton
                         name="Burndown"
                         icon={<TrendingDown className="h-5 w-5" />}
                         setActiveTab={setActiveTab}
@@ -71,12 +88,6 @@ const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
                     <TabButton
                         name="Timeline"
                         icon={<SquareChartGantt className="h-5 w-5" />}
-                        setActiveTab={setActiveTab}
-                        activeTab={activeTab}
-                    />
-                    <TabButton
-                        name="Table"
-                        icon={<Table className="h-5 w-5" />}
                         setActiveTab={setActiveTab}
                         activeTab={activeTab}
                     />

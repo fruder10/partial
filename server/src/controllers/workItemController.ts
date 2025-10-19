@@ -314,28 +314,10 @@ export const editWorkItem = async (req: Request, res: Response) => {
     if (updates.authorUserId !== undefined) updateData.authorUserId = updates.authorUserId;
     if (updates.assignedUserId !== undefined) updateData.assignedUserId = updates.assignedUserId;
 
-    if (updates.issueDetail) {
-      updateData.issueDetail = {
-        update: {
-          ...(updates.issueDetail.issueType && { issueType: updates.issueDetail.issueType }),
-          ...(updates.issueDetail.rootCause && { rootCause: updates.issueDetail.rootCause }),
-          ...(updates.issueDetail.correctiveAction && { correctiveAction: updates.issueDetail.correctiveAction }),
-        },
-      };
-    }
-
-    if (updates.deliverableDetail) {
-      updateData.deliverableDetail = {
-        update: {
-          ...(updates.deliverableDetail.deliverableType && { deliverableType: updates.deliverableDetail.deliverableType }),
-        },
-      };
-    }
-
     // 3️⃣ Update WorkItem
     const updatedWorkItem = await prisma.workItem.update({
       where: { id: Number(workItemId) },
-      data: updateData, // ✅ casted / type-safe object
+      data: updateData,
       include: {
         program: true,
         dueByMilestone: true,
@@ -348,14 +330,88 @@ export const editWorkItem = async (req: Request, res: Response) => {
       },
     });
 
-    // 4️⃣ Flatten partNumberIds for frontend
+    // 4️⃣ Handle issueDetail separately (upsert)
+    if (updates.issueDetail && updates.issueDetail.issueType) {
+      const existingIssueDetail = await prisma.issueDetail.findUnique({
+        where: { id: Number(workItemId) },
+      });
+
+      if (existingIssueDetail) {
+        // Update existing
+        await prisma.issueDetail.update({
+          where: { id: Number(workItemId) },
+          data: {
+            issueType: updates.issueDetail.issueType as any,
+            ...(updates.issueDetail.rootCause !== undefined && { rootCause: updates.issueDetail.rootCause }),
+            ...(updates.issueDetail.correctiveAction !== undefined && { correctiveAction: updates.issueDetail.correctiveAction }),
+          },
+        });
+      } else {
+        // Create new
+        await prisma.issueDetail.create({
+          data: {
+            id: Number(workItemId),
+            issueType: updates.issueDetail.issueType as any,
+            rootCause: updates.issueDetail.rootCause || null,
+            correctiveAction: updates.issueDetail.correctiveAction || null,
+          },
+        });
+      }
+    }
+
+    // 5️⃣ Handle deliverableDetail separately (upsert)
+    if (updates.deliverableDetail && updates.deliverableDetail.deliverableType) {
+      const existingDeliverableDetail = await prisma.deliverableDetail.findUnique({
+        where: { id: Number(workItemId) },
+      });
+
+      if (existingDeliverableDetail) {
+        // Update existing
+        await prisma.deliverableDetail.update({
+          where: { id: Number(workItemId) },
+          data: {
+            deliverableType: updates.deliverableDetail.deliverableType as any,
+          },
+        });
+      } else {
+        // Create new
+        await prisma.deliverableDetail.create({
+          data: {
+            id: Number(workItemId),
+            deliverableType: updates.deliverableDetail.deliverableType as any,
+          },
+        });
+      }
+    }
+
+    // 6️⃣ Fetch the updated work item with all relations
+    const finalWorkItem = await prisma.workItem.findUnique({
+      where: { id: Number(workItemId) },
+      include: {
+        program: true,
+        dueByMilestone: true,
+        deliverableDetail: true,
+        issueDetail: true,
+        authorUser: true,
+        assigneeUser: true,
+        comments: true,
+        partNumbers: { include: { partNumber: true } },
+      },
+    });
+
+    // 7️⃣ Flatten partNumberIds for frontend
     res.json({
-      ...updatedWorkItem,
-      partNumberIds: updatedWorkItem.partNumbers.map((p) => p.partNumberId),
+      ...finalWorkItem,
+      partNumberIds: finalWorkItem!.partNumbers.map((p) => p.partNumberId),
     });
   } catch (error: any) {
     console.error("Error updating work item:", error);
-    res.status(500).json({ message: `Error updating work item: ${error.message}` });
+    console.error("Error details:", JSON.stringify(error, null, 2));
+    res.status(500).json({ 
+      message: `Error updating work item: ${error.message || 'Unknown error'}`,
+      error: error.toString(),
+      stack: error.stack
+    });
   }
 };
 

@@ -5,7 +5,9 @@ import {  useEditPartMutation,
           useDeletePartMutation,
           useGetUsersQuery,
           useGetProgramsQuery,
-          useGetPartsQuery
+          useGetPartsQuery,
+          PartState,
+          PartStateLabels
 } from "@/state/api";
 import React, { useState, useEffect } from "react";
 import { PartNumber } from "@/state/api";
@@ -18,7 +20,7 @@ type Props = {
     number?: number;
     partName?: string;
     level?: number;
-    state?: string;
+    state?: PartState;
     revisionLevel?: string;
     assignedUserId?: number;
     programId?: number;
@@ -36,7 +38,7 @@ const ModalEditPart = ({ isOpen, onClose, part }: Props) => {
   const [partNumber, setPartNumber] = useState("");
   const [partName, setPartName] = useState("");
   const [level, setLevel] = useState("");
-  const [state, setState] = useState("");
+  const [state, setState] = useState<PartState | "">("");
   const [revisionLevel, setRevisionLevel] = useState("");
   const [assignedUserId, setAssignedUserId] = useState("");
   const [assignedUserName, setAssignedUserName] = useState("");
@@ -80,7 +82,7 @@ const ModalEditPart = ({ isOpen, onClose, part }: Props) => {
         number: Number(partNumber),
         partName,
         level: Number(level),
-        state,
+        state: state || undefined,
         revisionLevel,
         assignedUserId: Number(assignedUserId),
         programId: Number(programId),
@@ -162,13 +164,18 @@ const ModalEditPart = ({ isOpen, onClose, part }: Props) => {
             <label className="block text-sm text-gray-600 dark:text-gray-300">
                 State:
             </label>
-            <input
-                type="text"
+            <select
                 className={inputStyles}
-                placeholder="State"
                 value={state}
-                onChange={(e) => setState(e.target.value)}
-            />
+                onChange={(e) => setState(e.target.value as PartState)}
+            >
+                <option value="">Select State</option>
+                {Object.values(PartState).map((stateValue) => (
+                    <option key={stateValue} value={stateValue}>
+                        {PartStateLabels[stateValue]}
+                    </option>
+                ))}
+            </select>
         </div>
         <div>
             <label className="block text-sm text-gray-600 dark:text-gray-300">

@@ -80,6 +80,13 @@ enum WorkItemType {
   Issue
 }
 
+enum PartState {
+  Released
+  UnderReview
+  InWork
+  Implementation
+}
+
 // ===================
 // Core Models
 // ===================
@@ -150,11 +157,11 @@ model Milestone {
 }
 
 model PartNumber {
-  id             Int    @id @default(autoincrement())
-  number         Int    @unique
+  id             Int       @id @default(autoincrement())
+  number         Int       @unique
   partName       String
   level          Int
-  state          String
+  state          PartState
   revisionLevel  String
   assignedUserId Int
   programId      Int
