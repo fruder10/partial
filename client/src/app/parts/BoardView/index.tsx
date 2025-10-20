@@ -12,9 +12,27 @@ import Link from 'next/link';
 type BoardProps = {
     id: string;
     setIsModalNewWorkItemOpen: (isOpen: boolean) => void;
+    searchQuery: string;
 };
 
 const workItemStatus = ["ToDo", "WorkInProgress", "UnderReview", "Completed"];
+
+// Helper function to filter work items based on search query
+const filterWorkItemsBySearch = (workItems: WorkItemType[], searchQuery: string) => {
+    if (!searchQuery.trim()) return workItems;
+    
+    const query = searchQuery.toLowerCase();
+    return workItems.filter((item) => {
+        return (
+            item.title?.toLowerCase().includes(query) ||
+            item.description?.toLowerCase().includes(query) ||
+            item.tags?.toLowerCase().includes(query) ||
+            item.workItemType?.toLowerCase().includes(query) ||
+            item.status?.toLowerCase().includes(query) ||
+            item.priority?.toLowerCase().includes(query)
+        );
+    });
+};
 
 const statusLabels: Record<string, string> = {
   ToDo: "To Do",
@@ -23,7 +41,7 @@ const statusLabels: Record<string, string> = {
   Completed: "Completed"
 };
 
-const BoardView = ({ id, setIsModalNewWorkItemOpen }: BoardProps) => {
+const BoardView = ({ id, setIsModalNewWorkItemOpen, searchQuery }: BoardProps) => {
     const {
         data: workItems,
         isLoading,
@@ -37,6 +55,9 @@ const BoardView = ({ id, setIsModalNewWorkItemOpen }: BoardProps) => {
 
     const [editingWorkItem, setEditingWorkItem] = useState<WorkItemType | null>(null);
 
+    // Filter work items based on search query
+    const filteredWorkItems = filterWorkItemsBySearch(workItems || [], searchQuery);
+
     if (isLoading) return <div>Loading...</div>
     if (error) return <div>An error occured while fetching work items</div>;
 
@@ -46,7 +67,7 @@ const BoardView = ({ id, setIsModalNewWorkItemOpen }: BoardProps) => {
                 <WorkItemColumn
                     key={status}
                     status={status}
-                    workItems={workItems || []}
+                    workItems={filteredWorkItems}
                     moveWorkItem={moveWorkItem}
                     setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen}
                     setEditingWorkItem={setEditingWorkItem}

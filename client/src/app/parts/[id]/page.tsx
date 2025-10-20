@@ -17,6 +17,7 @@ const Part = ({ params }: Props) => {
     const { id } = React.use(params);
     const [activeTab, setActiveTab] = useState("Board");
     const [isModalNewWorkItemOpen, setIsModalNewWorkItemOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     // Fetch all parts assigned to the current user
     const userId = 12; // TODO: replace with useAppSelector(state => state.global.userId)
@@ -34,18 +35,24 @@ const Part = ({ params }: Props) => {
                 onClose={() => setIsModalNewWorkItemOpen(false)}
                 id={id}
             />
-            <PartHeader activeTab={activeTab} setActiveTab={setActiveTab} activePart={activePart} />
+            <PartHeader 
+                activeTab={activeTab} 
+                setActiveTab={setActiveTab} 
+                activePart={activePart}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+            />
             { activeTab === "Board" && (
-                <Board id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} />
+                <Board id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} searchQuery={searchQuery} />
             )}
             { activeTab === "Burndown" && (
-                <Burndown id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} />
+                <Burndown id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} searchQuery={searchQuery} />
             )}
             { activeTab === "Timeline" && (
-                <Timeline id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} />
+                <Timeline id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} searchQuery={searchQuery} />
             )}
             { activeTab === "Table" && (
-                <Table id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} />
+                <Table id={id} setIsModalNewWorkItemOpen={setIsModalNewWorkItemOpen} searchQuery={searchQuery} />
             )}
         </div>
     )

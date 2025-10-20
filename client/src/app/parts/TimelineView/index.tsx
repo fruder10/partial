@@ -12,9 +12,27 @@ import React, { useMemo, useState } from 'react';
 type Props = {
   id: string;
   setIsModalNewWorkItemOpen: (isOpen: boolean) => void;
+  searchQuery: string;
 };
 
-const Timeline = ({ id, setIsModalNewWorkItemOpen }: Props) => {
+// Helper function to filter work items based on search query
+const filterWorkItemsBySearch = (workItems: any[], searchQuery: string) => {
+  if (!searchQuery.trim()) return workItems;
+  
+  const query = searchQuery.toLowerCase();
+  return workItems.filter((item) => {
+    return (
+      item.title?.toLowerCase().includes(query) ||
+      item.description?.toLowerCase().includes(query) ||
+      item.tags?.toLowerCase().includes(query) ||
+      item.workItemType?.toLowerCase().includes(query) ||
+      item.status?.toLowerCase().includes(query) ||
+      item.priority?.toLowerCase().includes(query)
+    );
+  });
+};
+
+const Timeline = ({ id, setIsModalNewWorkItemOpen, searchQuery }: Props) => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const { data: workItems, error, isLoading } =
     useGetWorkItemsByPartNumberQuery({ partNumberId: Number(id) });
@@ -24,10 +42,15 @@ const Timeline = ({ id, setIsModalNewWorkItemOpen }: Props) => {
     locale: "en-US"
   });
 
+  // Filter work items based on search query
+  const filteredWorkItems = useMemo(() => {
+    return filterWorkItemsBySearch(workItems || [], searchQuery);
+  }, [workItems, searchQuery]);
+
   // ✅ Ensure ganttTasks matches the Task[] interface from gantt-task-react
   const ganttTasks: Task[] = useMemo(() => {
     return (
-      workItems?.map((workItem) => ({
+      filteredWorkItems?.map((workItem) => ({
         start: new Date(workItem.dateOpened as string),
         end: new Date(workItem.dueDate as string),
         name: workItem.title,
@@ -37,7 +60,7 @@ const Timeline = ({ id, setIsModalNewWorkItemOpen }: Props) => {
         isDisabled: false
       })) || []
     );
-  }, [workItems]);
+  }, [filteredWorkItems]);
 
   const handleViewModeChange = (
     event: React.ChangeEvent<HTMLSelectElement>

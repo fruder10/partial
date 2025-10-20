@@ -8,7 +8,18 @@ export const getPrograms = async (
   res: Response
 ): Promise<void> => {
   try {
-    const programs = await prisma.program.findMany();
+    const programs = await prisma.program.findMany({
+      include: {
+        partNumbers: true,
+        disciplineTeams: {
+          include: {
+            disciplineTeam: true,
+          },
+        },
+        milestones: true,
+        workItems: true,
+      },
+    });
     res.json(programs);
   } catch (error: any) {
     res

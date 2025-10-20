@@ -8,7 +8,14 @@ export const getParts = async (
   res: Response
 ): Promise<void> => {
   try {
-    const parts = await prisma.partNumber.findMany();
+    const parts = await prisma.partNumber.findMany({
+      include: {
+        assignedUser: true,
+        program: true,
+        parent: true,
+        children: true,
+      },
+    });
     res.json(parts);
   } catch (error: any) {
     res
