@@ -9,6 +9,24 @@ import ModalEditWorkItem from "@/components/ModalEditWorkItem";
 type Props = {
   id: string;
   setIsModalNewWorkItemOpen: (isOpen: boolean) => void;
+  searchQuery: string;
+};
+
+// Helper function to filter work items based on search query
+const filterWorkItemsBySearch = (workItems: WorkItem[], searchQuery: string) => {
+  if (!searchQuery.trim()) return workItems;
+  
+  const query = searchQuery.toLowerCase();
+  return workItems.filter((item) => {
+    return (
+      item.title?.toLowerCase().includes(query) ||
+      item.description?.toLowerCase().includes(query) ||
+      item.tags?.toLowerCase().includes(query) ||
+      item.workItemType?.toLowerCase().includes(query) ||
+      item.status?.toLowerCase().includes(query) ||
+      item.priority?.toLowerCase().includes(query)
+    );
+  });
 };
 
 const getStatusColor = (status: Status) => {
@@ -246,7 +264,7 @@ const columns: GridColDef[] = [
   },
 ];
 
-const TableView = ({ id, setIsModalNewWorkItemOpen }: Props) => {
+const TableView = ({ id, setIsModalNewWorkItemOpen, searchQuery }: Props) => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const [workItemFilter, setWorkItemFilter] = React.useState<"all" | "open">("all");
   const [editingWorkItem, setEditingWorkItem] = React.useState<WorkItem | null>(null);
@@ -260,10 +278,13 @@ const TableView = ({ id, setIsModalNewWorkItemOpen }: Props) => {
   if (isLoading) return <div>Loading...</div>;
   if (error || !workItems) return <div>An error occurred while fetching work items</div>;
 
-  // Filter work items based on the toggle
-  const filteredWorkItems = workItemFilter === "open"
+  // Filter work items based on the toggle and search query
+  let filteredWorkItems = workItemFilter === "open"
     ? workItems.filter((item) => item.status !== Status.Completed)
     : workItems;
+  
+  // Apply search filter
+  filteredWorkItems = filterWorkItemsBySearch(filteredWorkItems, searchQuery);
 
   return (
     <div className="h-[calc(100vh-250px)] w-full px-4 pb-8 xl:px-6">

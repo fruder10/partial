@@ -1,5 +1,5 @@
 import Header from '@/components/Header';
-import { Filter, SquareKanban, Grid3x3, TrendingDown, PlusSquare, Share2, SquarePen, Table, SquareChartGantt } from 'lucide-react';
+import { Filter, SquareKanban, Search, TrendingDown, PlusSquare, Share2, SquarePen, Table, SquareChartGantt } from 'lucide-react';
 import React, { useState } from 'react';
 import ModalNewPart from "./ModalNewPart";
 import ModalEditPart from "./ModalEditPart";
@@ -9,9 +9,11 @@ type Props = {
     activeTab: string;
     setActiveTab: (tabname: string) => void
     activePart?: Partial<PartNumber> | null;
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
 };
 
-const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
+const PartHeader = ({ activeTab, setActiveTab, activePart, searchQuery, setSearchQuery }: Props) => {
     const [isModalNewPartOpen, setIsModalNewPartOpen] = useState(false); 
     const [isModalEditPartOpen, setIsModalEditPartOpen] = useState(false);
     const { data: users = [] } = useGetUsersQuery();
@@ -100,9 +102,14 @@ const PartHeader = ({ activeTab, setActiveTab, activePart }: Props) => {
                         <Share2 className="h-5 w-5" />
                     </button>
                     <div className="relative">
-                        <input type="text" placeholder="Search Work Item"
-                            className="rounded-md border py-1 pl-10 pr-4 focus:outline-none dark:border-dark-secondary dark:bg-dark-secondary dark:text-white" />
-                        <Grid3x3 className="absolute left-3 top-2 h-4 w-4 text-gray-400 dark:text-neutral-500" />
+                        <input 
+                            type="text" 
+                            placeholder="Search Work Item"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="rounded-md border py-1 pl-10 pr-4 focus:outline-none dark:border-dark-secondary dark:bg-dark-secondary dark:text-white" 
+                        />
+                        <Search className="absolute left-3 top-2 h-4 w-4 text-gray-400 dark:text-neutral-500" />
                     </div>
                 </div>
             </div>

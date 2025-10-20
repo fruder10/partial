@@ -10,9 +10,27 @@ import React, { useMemo, useState } from "react";
 type Props = {
   id: string;
   setIsModalNewWorkItemOpen: (isOpen: boolean) => void;
+  searchQuery: string;
 };
 
-const BurndownView = ({ id, setIsModalNewWorkItemOpen }: Props) => {
+// Helper function to filter work items based on search query
+const filterWorkItemsBySearch = (workItems: WorkItem[], searchQuery: string) => {
+  if (!searchQuery.trim()) return workItems;
+  
+  const query = searchQuery.toLowerCase();
+  return workItems.filter((item) => {
+    return (
+      item.title?.toLowerCase().includes(query) ||
+      item.description?.toLowerCase().includes(query) ||
+      item.tags?.toLowerCase().includes(query) ||
+      item.workItemType?.toLowerCase().includes(query) ||
+      item.status?.toLowerCase().includes(query) ||
+      item.priority?.toLowerCase().includes(query)
+    );
+  });
+};
+
+const BurndownView = ({ id, setIsModalNewWorkItemOpen, searchQuery }: Props) => {
   const { data: workItems, error, isLoading } = useGetWorkItemsByPartNumberQuery({
     partNumberId: Number(id),
   });
@@ -23,10 +41,15 @@ const BurndownView = ({ id, setIsModalNewWorkItemOpen }: Props) => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>An error occurred while fetching work items</div>;
 
+  // Filter work items based on search query
+  const searchFilteredWorkItems = useMemo(() => {
+    return filterWorkItemsBySearch(workItems || [], searchQuery);
+  }, [workItems, searchQuery]);
+
   // ✅ Filter valid work items with a due date for the chart
   const validWorkItems = useMemo(
-    () => (workItems ?? []).filter((w) => w.dueDate),
-    [workItems]
+    () => (searchFilteredWorkItems ?? []).filter((w) => w.dueDate),
+    [searchFilteredWorkItems]
   );
 
   // Work Items filtered by Type:

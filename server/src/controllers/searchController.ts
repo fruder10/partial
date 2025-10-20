@@ -38,6 +38,16 @@ export const search = async (req: Request, res: Response): Promise<void> => {
           { description: { contains: query, mode: "insensitive" } },
         ],
       },
+      include: {
+        partNumbers: true,
+        disciplineTeams: {
+          include: {
+            disciplineTeam: true,
+          },
+        },
+        milestones: true,
+        workItems: true,
+      },
     });
 
     const users = await prisma.user.findMany({
@@ -49,6 +59,12 @@ export const search = async (req: Request, res: Response): Promise<void> => {
           { phoneNumber: { contains: query, mode: "insensitive" } },
         ],
       },
+      include: {
+        disciplineTeam: true,
+        authoredWorkItems: true,
+        assignedWorkItems: true,
+        partNumbers: true,
+      },
     });
 
     const milestones = await prisma.milestone.findMany({
@@ -57,6 +73,10 @@ export const search = async (req: Request, res: Response): Promise<void> => {
           { name: { contains: query, mode: "insensitive" } },
           { description: { contains: query, mode: "insensitive" } },
         ],
+      },
+      include: {
+        program: true,
+        workItems: true,
       },
     });
 
@@ -68,6 +88,12 @@ export const search = async (req: Request, res: Response): Promise<void> => {
             : []),
           { partName: { contains: query, mode: "insensitive" } },
         ],
+      },
+      include: {
+        assignedUser: true,
+        program: true,
+        parent: true,
+        children: true,
       },
     });
 

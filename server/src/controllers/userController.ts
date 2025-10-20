@@ -11,6 +11,9 @@ export const getUsers = async (
     const users = await prisma.user.findMany({
       include: {
         disciplineTeam: true,
+        authoredWorkItems: true,
+        assignedWorkItems: true,
+        partNumbers: true,
       },
     });
     res.json(users);

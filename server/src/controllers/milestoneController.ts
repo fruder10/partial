@@ -8,7 +8,12 @@ export const getMilestones = async (
   res: Response
 ): Promise<void> => {
   try {
-    const milestones = await prisma.milestone.findMany();
+    const milestones = await prisma.milestone.findMany({
+      include: {
+        program: true,
+        workItems: true,
+      },
+    });
     res.json(milestones);
   } catch (error: any) {
     res

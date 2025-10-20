@@ -130,6 +130,13 @@ export enum WorkItemType {
    CORE INTERFACES
 =================== */
 
+export interface DisciplineTeamToProgram {
+  id: number;
+  disciplineTeamId: number;
+  programId: number;
+  disciplineTeam: DisciplineTeam;
+}
+
 export interface Program {
   id: number;
   name: string;
@@ -139,7 +146,7 @@ export interface Program {
   endDate: string;
 
   partNumbers?: PartNumber[];
-  disciplineTeams?: DisciplineTeam[];
+  disciplineTeams?: DisciplineTeamToProgram[];
   milestones?: Milestone[];
   workItems?: WorkItem[];
 }
@@ -170,6 +177,7 @@ export interface Milestone {
   date: string;
   programId: number;
 
+  program?: Program;
   workItems?: WorkItem[];
 }
 
@@ -198,6 +206,9 @@ export interface PartNumber {
   programId: number;
   parentId?: number;
 
+  assignedUser?: User;
+  program?: Program;
+  parent?: PartNumber;
   children?: PartNumber[];
   workItemLinks?: WorkItemToPartNumber[];
 }
