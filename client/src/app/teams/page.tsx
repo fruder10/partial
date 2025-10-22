@@ -3,6 +3,8 @@ import { useGetTeamsQuery, useGetUsersQuery, useGetWorkItemsQuery, WorkItemType,
 import React, { useMemo, useState, useEffect } from "react";
 import { useAppSelector } from "../redux";
 import Header from "@/components/Header";
+import ModalNewDisciplineTeam from "@/components/ModalNewDisciplineTeam";
+import ModalEditDisciplineTeam from "@/components/ModalEditDisciplineTeam";
 import BurndownChart from "@/components/BurndownChart";
 import {
   DataGrid,
@@ -23,6 +25,7 @@ import {
   YAxis,
 } from "recharts";
 import { format } from "date-fns";
+import { PlusSquare, SquarePen } from "lucide-react";
 
 const COLORS = ["#6FA8DC", "#66CDAA", "#FF9500", "#FF8042", "#A28FD0", "#FF6384", "#36A2EB"];
 
@@ -164,7 +167,18 @@ const Teams = () => {
   const [selectedPriority, setSelectedPriority] = useState<Priority | "all">(Priority.Urgent);
   const [workItemFilter, setWorkItemFilter] = useState<"all" | "open">("all");
   
+  // Modal states
+  const [isNewTeamModalOpen, setIsNewTeamModalOpen] = useState(false);
+  const [isEditTeamModalOpen, setIsEditTeamModalOpen] = useState(false);
+  const [teamToEdit, setTeamToEdit] = useState<any>(null);
+  
   const { data: teams, isLoading, isError } = useGetTeamsQuery();
+
+  // Get the selected team data for the edit button
+  const selectedTeam = useMemo(() => {
+    if (selectedTeamId === "all" || !teams) return null;
+    return teams.find(team => team.id === selectedTeamId) || null;
+  }, [selectedTeamId, teams]);
 
   // Auto-select the first team when teams are loaded
   useEffect(() => {
@@ -310,13 +324,37 @@ const Teams = () => {
 
   return (
     <div className="flex w-full flex-col p-8">
-      <Header name="Teams" />
+      <Header 
+        name="Teams" 
+        buttonComponent={
+          <div className="flex gap-3">
+            {/* New Team Button */}
+            <button
+              onClick={() => setIsNewTeamModalOpen(true)}
+              className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            >
+              <PlusSquare className="mr-2 h-5 w-5" />
+              New Team
+            </button>
+            {/* Edit Team Button - only show when a specific team is selected */}
+            {selectedTeam && (
+              <button
+                onClick={() => {
+                  setTeamToEdit(selectedTeam);
+                  setIsEditTeamModalOpen(true);
+                }}
+                className="flex items-center rounded-md bg-gray-300 px-3 py-2 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:bg-dark-tertiary dark:text-white dark:hover:bg-gray-600"
+              >
+                <SquarePen className="mr-2 h-4 w-4" />
+                Edit Team
+              </button>
+            )}
+          </div>
+        }
+      />
 
       {/* Teams DataGrid */}
       <div className="mb-6 rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
-        <h3 className="mb-4 text-lg font-semibold dark:text-white">
-          Discipline Teams
-        </h3>
         <div style={{ height: 400, width: "100%" }}>
           <DataGrid
             rows={teams || []}
@@ -509,6 +547,18 @@ const Teams = () => {
           </div>
         </div>
       )}
+      
+      {/* Modals */}
+      <ModalNewDisciplineTeam
+        isOpen={isNewTeamModalOpen}
+        onClose={() => setIsNewTeamModalOpen(false)}
+      />
+      
+      <ModalEditDisciplineTeam
+        isOpen={isEditTeamModalOpen}
+        onClose={() => setIsEditTeamModalOpen(false)}
+        team={teamToEdit}
+      />
     </div>
   );
 };

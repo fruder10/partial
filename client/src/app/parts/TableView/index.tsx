@@ -5,6 +5,7 @@ import { useGetWorkItemsByPartNumberQuery, WorkItemType, Status, Priority, Issue
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import ModalEditWorkItem from "@/components/ModalEditWorkItem";
+import { PlusSquare } from "lucide-react";
 
 type Props = {
   id: string;
@@ -325,7 +326,7 @@ const TableView = ({ id, setIsModalNewWorkItemOpen, searchQuery }: Props) => {
             className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
             onClick={() => setIsModalNewWorkItemOpen(true)}
           >
-            Add Work Item
+            <PlusSquare className="mr-2 h-5 w-5" />New Work Item
           </button>
         </div>
       </div>

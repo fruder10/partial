@@ -126,7 +126,7 @@ const Sidebar = () => {
                 <nav className="z-10 w-full">
                     <SidebarLink icon={Home} label="Home" href="/" />
                     <SidebarLink icon={Search} label="Search" href="/search" />
-                    <SidebarLink icon={Briefcase} label="Program Timeline" href="/timeline" />
+                    <SidebarLink icon={Briefcase} label="Programs" href="/programs" />
                     <SidebarLink icon={TreePine} label="Part Hierarchy" href="/part-hierarchy" />
                     <SidebarLink icon={User} label="Users" href="/users" />
                     <SidebarLink icon={Users} label="Teams" href="/teams" />

@@ -476,6 +476,17 @@ export const api = createApi({
       }),
       invalidatesTags: ["Milestones"],
     }),
+    editMilestone: build.mutation<Milestone, { milestoneId: number; updates: Partial<Milestone> }>({
+      query: ({ milestoneId, updates }) => ({
+        url: `milestones/${milestoneId}`,
+        method: "PATCH",
+        body: updates,
+      }),
+      invalidatesTags: (result, error, { milestoneId }) => [
+        { type: "Milestones", id: milestoneId },
+        { type: "Milestones", id: "LIST" },
+      ],
+    }),
 
     /* ---------- PART NUMBERS ---------- */
     getParts: build.query<PartNumber[], void>({
@@ -551,6 +562,17 @@ export const api = createApi({
       }),
       invalidatesTags: ["Programs"],
     }),
+    editProgram: build.mutation<Program, { programId: number; updates: Partial<Program> }>({
+      query: ({ programId, updates }) => ({
+        url: `programs/${programId}`,
+        method: "PATCH",
+        body: updates,
+      }),
+      invalidatesTags: (result, error, { programId }) => [
+        { type: "Programs", id: programId },
+        { type: "Programs", id: "LIST" },
+      ],
+    }),
 
     /* ---------- TEAMS ---------- */
     getTeams: build.query<DisciplineTeam[], void>({
@@ -564,6 +586,17 @@ export const api = createApi({
         body,
       }),
       invalidatesTags: ["Teams"],
+    }),
+    editTeam: build.mutation<DisciplineTeam, { teamId: number; updates: Partial<DisciplineTeam> }>({
+      query: ({ teamId, updates }) => ({
+        url: `teams/${teamId}`,
+        method: "PATCH",
+        body: updates,
+      }),
+      invalidatesTags: (result, error, { teamId }) => [
+        { type: "Teams", id: teamId },
+        { type: "Teams", id: "LIST" },
+      ],
     }),
 
     /* ---------- USERS ---------- */
@@ -595,6 +628,7 @@ export const {
   useGetMilestonesQuery,
   useGetMilestonesByProgramQuery,
   useCreateMilestoneMutation,
+  useEditMilestoneMutation,
 
   useGetPartsQuery,
   useGetPartsByProgramQuery,
@@ -605,9 +639,11 @@ export const {
 
   useGetProgramsQuery,
   useCreateProgramMutation,
+  useEditProgramMutation,
 
   useGetTeamsQuery,
   useCreateTeamMutation,
+  useEditTeamMutation,
 
   useGetUsersQuery,
 
