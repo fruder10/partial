@@ -21,6 +21,7 @@ import {
     Search,
     Settings,
     ShieldAlert,
+    TreePine,
     User,
     Users,
     X,
@@ -92,7 +93,7 @@ const Sidebar = () => {
             <div className="flex h-[100%] w-full flex-col justify-start">
                 {/* TOP LOGO */}
                 <div className="z-50 flex min-h-[56px] w-64 items-center justify-between bg-white px-6 pt-3 dark:bg-black">
-                    <div className="text-xl font-bolt text-gray-800 dark:text-white">
+                    <div className="text-xl font-bold text-gray-800 dark:text-white">
                         PARTIAL
                     </div>
                     {!isSidebarCollapsed && (
@@ -126,6 +127,7 @@ const Sidebar = () => {
                     <SidebarLink icon={Home} label="Home" href="/" />
                     <SidebarLink icon={Search} label="Search" href="/search" />
                     <SidebarLink icon={Briefcase} label="Program Timeline" href="/timeline" />
+                    <SidebarLink icon={TreePine} label="Part Hierarchy" href="/part-hierarchy" />
                     <SidebarLink icon={User} label="Users" href="/users" />
                     <SidebarLink icon={Users} label="Teams" href="/teams" />
                     <SidebarLink icon={Settings} label="Settings" href="/settings" />

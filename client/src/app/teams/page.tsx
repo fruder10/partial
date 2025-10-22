@@ -1,6 +1,6 @@
 "use client";
 import { useGetTeamsQuery, useGetUsersQuery, useGetWorkItemsQuery, WorkItemType, Priority, WorkItem, Status } from "@/state/api";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useAppSelector } from "../redux";
 import Header from "@/components/Header";
 import BurndownChart from "@/components/BurndownChart";
@@ -165,6 +165,13 @@ const Teams = () => {
   const [workItemFilter, setWorkItemFilter] = useState<"all" | "open">("all");
   
   const { data: teams, isLoading, isError } = useGetTeamsQuery();
+
+  // Auto-select the first team when teams are loaded
+  useEffect(() => {
+    if (teams && teams.length > 0 && selectedTeamId === "all") {
+      setSelectedTeamId(teams[0].id);
+    }
+  }, [teams, selectedTeamId]);
   const { data: users } = useGetUsersQuery();
   const { data: workItems } = useGetWorkItemsQuery();
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
@@ -325,6 +332,9 @@ const Teams = () => {
       {/* Team Selector and Work Item Filter */}
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-4">
+          <label htmlFor="team-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Select a Team:
+          </label>
           <select
             id="team-select"
             className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:bg-dark-secondary dark:text-white"
@@ -334,7 +344,6 @@ const Teams = () => {
               setSelectedTeamId(value === "all" ? "all" : parseInt(value));
             }}
           >
-            <option value="all">Select Discipline Team</option>
             {teams?.map((team) => (
               <option key={team.id} value={team.id}>
                 {team.name}

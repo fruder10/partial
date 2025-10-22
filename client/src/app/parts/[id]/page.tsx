@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetPartsByUserQuery } from "@/state/api";
+import { useGetPartsQuery } from "@/state/api";
 import React, { useState } from 'react';
 import PartHeader from "@/app/parts/PartHeader";
 import Board from '../BoardView';
@@ -19,10 +19,9 @@ const Part = ({ params }: Props) => {
     const [isModalNewWorkItemOpen, setIsModalNewWorkItemOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
-    // Fetch all parts assigned to the current user
-    const userId = 12; // TODO: replace with useAppSelector(state => state.global.userId)
-    const { data: userParts = [], isLoading } = useGetPartsByUserQuery(userId!, { skip: !userId });
-    const activePart = userParts.find((p) => p.id === Number(id));
+    // Fetch all parts to find the requested part
+    const { data: allParts = [], isLoading } = useGetPartsQuery();
+    const activePart = allParts.find((p) => p.id === Number(id));
 
     // Optional: handle loading / not found cases
     if (isLoading) return <div className="p-4 text-gray-500">Loading parts...</div>;
