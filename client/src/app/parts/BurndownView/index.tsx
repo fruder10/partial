@@ -6,6 +6,7 @@ import BurndownChart from "@/components/BurndownChart";
 import { WorkItem, WorkItemType, useGetWorkItemsByPartNumberQuery } from "@/state/api";
 import { useAppSelector } from "@/app/redux";
 import React, { useMemo, useState } from "react";
+import { PlusSquare } from "lucide-react";
 
 type Props = {
   id: string;
@@ -69,7 +70,7 @@ const BurndownView = ({ id, setIsModalNewWorkItemOpen, searchQuery }: Props) => 
               className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
               onClick={() => setIsModalNewWorkItemOpen(true)}
             >
-              Add Work Item
+              <PlusSquare className="mr-2 h-5 w-5" />New Work Item
             </button>
           }
           isSmallText

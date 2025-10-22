@@ -401,63 +401,131 @@ const HomePage = () => {
 
         {/* 🧩 Milestones Section */}
         <div className="col-span-3 md:col-span-1 md:row-span-2">
-          <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:max-h-[940px] max-h-[50vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold mb-4 dark:text-white">
-              Program Milestones
-            </h2>
+          <div className="rounded-lg bg-white shadow dark:bg-dark-secondary md:max-h-[940px] max-h-[50vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-dark-secondary z-10 p-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold dark:text-white">
+                  Program Milestones
+                </h2>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {displayedMilestones?.length || 0} milestones
+                </div>
+              </div>
+            </div>
+            <div className="p-4 pt-0">
 
             {milestonesLoading ? (
-              <p className="text-gray-500 dark:text-gray-300">Loading milestones...</p>
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-500 dark:text-gray-300">Loading milestones...</span>
+              </div>
             ) : milestonesError ? (
-              <p className="text-red-500">Error loading milestones.</p>
-            ) : (
-              <table className="w-full text-sm border-collapse">
-                <thead className="sticky top-0 bg-white dark:bg-dark-secondary z-10">
-                  <tr className="border-b border-gray-300 dark:border-gray-600">
-                    <th className="text-left py-2 dark:text-gray-300">Program</th>
-                    <th className="text-left py-2 dark:text-gray-300">Milestone</th>
-                    <th className="text-left py-2 dark:text-gray-300">Date</th>
-                    <th className="text-left py-2 dark:text-gray-300"># of Work Items</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {displayedMilestones?.map((milestone) => {
+              <div className="text-center py-8">
+                <div className="text-red-500 text-sm">Error loading milestones</div>
+              </div>
+            ) : displayedMilestones && displayedMilestones.length > 0 ? (
+              <div className="space-y-3">
+                {[...displayedMilestones]
+                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                  .map((milestone) => {
                     const milestoneWorkItems = filteredWorkItems?.filter(
                       (wi) => wi.dueByMilestoneId === milestone.id
                     );
                     const programName =
                       programs.find((p) => p.id === milestone.programId)?.name || "—";
 
-                    // Check if milestone date is in the past
-                    const isPast = milestone.date ? new Date(milestone.date) < new Date() : false;
-                    
+                    // Enhanced status logic
+                    const today = new Date();
+                    const milestoneDate = milestone.date ? new Date(milestone.date) : null;
+                    const isPast = milestoneDate ? milestoneDate < today : false;
+                    const isUpcoming = milestoneDate ? {
+                      daysUntil: Math.ceil((milestoneDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
+                      isWithin30Days: Math.ceil((milestoneDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) <= 30
+                    } : null;
+
+                    // Status badge
+                    const getStatusBadge = () => {
+                      if (isPast) {
+                        return (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full mr-1"></div>
+                            Completed
+                          </span>
+                        );
+                      } else if (isUpcoming?.isWithin30Days) {
+                        return (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full mr-1 animate-pulse"></div>
+                            Due in {isUpcoming.daysUntil} days
+                          </span>
+                        );
+                      } else {
+                        return (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
+                            Upcoming
+                          </span>
+                        );
+                      }
+                    };
+
                     return (
-                      <tr
+                      <div
                         key={milestone.id}
-                        className={`border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-dark-tertiary transition ${
-                          isPast ? "bg-gray-100 dark:bg-gray-800" : ""
+                        className={`p-3 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                          isPast 
+                            ? "bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700" 
+                            : isUpcoming?.isWithin30Days
+                            ? "bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-700"
+                            : "bg-white border-gray-200 dark:bg-dark-tertiary dark:border-gray-700"
                         }`}
                       >
-                        <td className={`py-2 ${isPast ? "text-gray-500 dark:text-gray-400" : "dark:text-white"}`}>
-                          {programName}
-                        </td>
-                        <td className={`py-2 ${isPast ? "text-gray-500 dark:text-gray-400" : "dark:text-white"}`}>
-                          {milestone.name}
-                        </td>
-                        <td className={`py-2 ${isPast ? "text-gray-500 dark:text-gray-400" : "dark:text-gray-300"}`}>
-                          {milestone.date
-                            ? new Date(milestone.date).toLocaleDateString()
-                            : "—"}
-                        </td>
-                        <td className={`py-2 ${isPast ? "text-gray-500 dark:text-gray-400" : "dark:text-gray-300"}`}>
-                          {milestoneWorkItems?.length ?? 0}
-                        </td>
-                      </tr>
+                        <div className="flex items-start justify-between mb-1">
+                          <div className="flex-1 min-w-0">
+                            <h3 className={`font-semibold text-sm truncate ${
+                              isPast ? "text-gray-600 dark:text-gray-400" : "text-gray-900 dark:text-white"
+                            }`}>
+                              {milestone.name}
+                            </h3>
+                            <p className={`text-xs ${
+                              isPast ? "text-gray-500 dark:text-gray-500" : "text-gray-600 dark:text-gray-300"
+                            }`}>
+                              {programName}
+                            </p>
+                          </div>
+                          {getStatusBadge()}
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-xs">
+                          <span className={`${
+                            isPast ? "text-gray-500 dark:text-gray-500" : "text-gray-600 dark:text-gray-400"
+                          }`}>
+                            {milestoneDate ? milestoneDate.toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            }) : "No date"}
+                          </span>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            milestoneWorkItems && milestoneWorkItems.length > 0
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                          }`}>
+                            {milestoneWorkItems?.length || 0} work items
+                          </span>
+                        </div>
+                      </div>
                     );
                   })}
-                </tbody>
-              </table>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-gray-500 dark:text-gray-400 text-sm">
+                  No milestones found
+                </div>
+              </div>
             )}
+            </div>
           </div>
         </div>
 
