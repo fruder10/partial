@@ -5,13 +5,9 @@ import Header from '@/components/Header';
 import ModalNewWorkItem from '@/components/ModalNewWorkItem';
 import WorkItemCard from '@/components/WorkItemCard';
 import { dataGridClassNames, dataGridSxStyles } from '@/lib/utils';
-import { Priority, WorkItem, useGetWorkItemsByUserQuery } from '@/state/api';
+import { WorkItem, WorkItemType, useGetWorkItemsByUserQuery } from '@/state/api';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import React, { useState } from 'react';
-
-type Props = {
-    priority: Priority
-};
 
 const columns: GridColDef[] = [
   {
@@ -68,7 +64,7 @@ const columns: GridColDef[] = [
   },
 ];
 
-const ReusablePriorityPage = ({ priority }: Props) => {
+const IssuesPage = () => {
     const [ view, setView ] = useState("list");
     const [ isModalNewWorkItemOpen, setIsModalNewWorkItemOpen ] = useState(false);
     
@@ -79,7 +75,7 @@ const ReusablePriorityPage = ({ priority }: Props) => {
 
     const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
-    const filteredWorkItems = workItems?.filter((workItem: WorkItem) => workItem.priority === priority)
+    const filteredWorkItems = workItems?.filter((workItem: WorkItem) => workItem.workItemType === WorkItemType.Issue)
 
     if (isTasksError || !workItems) return <div>Error fetching work items.</div>
 
@@ -87,12 +83,12 @@ const ReusablePriorityPage = ({ priority }: Props) => {
         <div className="m-5 p-4">
             <ModalNewWorkItem isOpen={isModalNewWorkItemOpen} onClose={() => setIsModalNewWorkItemOpen(false)} />
             <Header 
-                name="Priority Page"
+                name="Issues"
                 buttonComponent={
                     <button
                         className="mr-3 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
                         onClick={() => setIsModalNewWorkItemOpen(true)}>
-                            Add Work Item
+                            Add Issue
                     </button>
                 }
             />
@@ -114,7 +110,7 @@ const ReusablePriorityPage = ({ priority }: Props) => {
                         Table
                 </button>
             </div>
-            {isLoading ? (<div>Loading work items...</div>) : view === "list" ? (
+            {isLoading ? (<div>Loading issues...</div>) : view === "list" ? (
                 <div className="grid grid-cols-1 gap-4">
                     {filteredWorkItems?.map((workItem: WorkItem) => (
                         <WorkItemCard key={workItem.id} workItem={workItem} />
@@ -138,4 +134,4 @@ const ReusablePriorityPage = ({ priority }: Props) => {
     )
 };
 
-export default ReusablePriorityPage;
+export default IssuesPage;
