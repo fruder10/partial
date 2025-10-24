@@ -7,20 +7,18 @@ import {
     useGetPartsByUserQuery
 } from '@/state/api';
 import {
-    AlertCircle,
-    AlertOctagon,
     AlertTriangle,
     Bolt,
     Briefcase,
+    CheckSquare,
     ChevronDown,
     ChevronUp,
+    FileText,
     Home,
-    Layers3,
     LockIcon,
     LucideIcon,
     Search,
     Settings,
-    ShieldAlert,
     TreePine,
     User,
     Users,
@@ -32,8 +30,8 @@ import { usePathname } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 
 const Sidebar = () => {
-    const [showPriority, setShowPriority] = useState(true);
     const [showPrograms, setShowPrograms] = useState(true);
+    const [showWorkItems, setShowWorkItems] = useState(true);
     const [expandedPrograms, setExpandedPrograms] = useState<Record<number, boolean>>({});
 
     const { data: programs } = useGetProgramsQuery();
@@ -194,27 +192,26 @@ const Sidebar = () => {
                         );
                     })}
 
-                {/* PRIORITIES LINKS */}
+                {/* WORK ITEMS LINKS */}
                 <button
-                    onClick={() => setShowPriority((prev) => !prev)}
+                    onClick={() => setShowWorkItems((prev) => !prev)}
                     className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
                 >
-                    <span>Priority</span>
-                    {showPriority ? (
+                    <span>Work Items</span>
+                    {showWorkItems ? (
                         <ChevronUp className="h-5 w-5" />
                     ) : (
                         <ChevronDown className="h-5 w-5" />
                     )}
                 </button>
-                {showPriority && (
+                {showWorkItems && (
                     <>
-                        <SidebarLink icon={AlertCircle} label="Urgent" href="/priority/urgent" />
-                        <SidebarLink icon={ShieldAlert} label="High" href="/priority/high" />
-                        <SidebarLink icon={AlertTriangle} label="Medium" href="/priority/medium" />
-                        <SidebarLink icon={AlertOctagon} label="Low" href="/priority/low" />
-                        <SidebarLink icon={Layers3} label="Backlog" href="/priority/backlog" />
+                        <SidebarLink icon={FileText} label="Deliverables" href="/work-items/deliverables" />
+                        <SidebarLink icon={AlertTriangle} label="Issues" href="/work-items/issues" />
+                        <SidebarLink icon={CheckSquare} label="Tasks" href="/work-items/tasks" />
                     </>
                 )}
+
             </div>
         </div>
     );
