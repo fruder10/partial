@@ -10,6 +10,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { PlusSquare } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const getStatusColor = (status: Status) => {
   switch (status) {
@@ -143,6 +144,7 @@ const workItemColumns: GridColDef<WorkItem>[] = [
 ];
 
 const TasksPage = () => {
+    const router = useRouter();
     const [ isModalNewWorkItemOpen, setIsModalNewWorkItemOpen ] = useState(false);
     const [ selectedPriority, setSelectedPriority ] = useState<Priority | "all">("all");
     const [ workItemFilter, setWorkItemFilter ] = useState<"all" | "open">("all");
@@ -323,6 +325,7 @@ const TasksPage = () => {
                                 sortModel: [{ field: "dueDate", sort: "asc" }],
                             },
                         }}
+                        onRowClick={(params) => router.push(`/work-items/${params.row.id}`)}
                     />
                 </div>
             </div>

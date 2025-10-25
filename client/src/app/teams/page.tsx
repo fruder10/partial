@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import ModalNewDisciplineTeam from "@/components/ModalNewDisciplineTeam";
 import ModalEditDisciplineTeam from "@/components/ModalEditDisciplineTeam";
 import BurndownChart from "@/components/BurndownChart";
+import { useRouter } from "next/navigation";
 import {
   DataGrid,
   GridColDef,
@@ -161,6 +162,7 @@ const workItemColumns: GridColDef<WorkItem>[] = [
 ];
 
 const Teams = () => {
+  const router = useRouter();
   const [selectedTeamId, setSelectedTeamId] = useState<number | "all">("all");
   const [chartMode, setChartMode] = useState<"type" | "priority">("type");
   const [selectedWorkItemType, setSelectedWorkItemType] = useState<WorkItemType | "all">("all");
@@ -532,7 +534,6 @@ const Teams = () => {
             <DataGrid
               rows={displayedWorkItems}
               columns={workItemColumns}
-              checkboxSelection
               getRowClassName={() => "data-grid-row"}
               getCellClassName={() => "data-grid-cell"}
               className={dataGridClassNames}
@@ -543,6 +544,7 @@ const Teams = () => {
                   sortModel: [{ field: "dueDate", sort: "asc" }],
                 },
               }}
+              onRowClick={(params) => router.push(`/work-items/${params.row.id}`)}
             />
           </div>
         </div>

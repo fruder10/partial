@@ -1,6 +1,7 @@
 import { WorkItem, StatusLabels, DeliverableTypeLabels, IssueTypeLabels } from "@/state/api";
 import { format } from "date-fns";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 type Props = {
@@ -8,8 +9,17 @@ type Props = {
 };
 
 const WorkItemCard = ({ workItem }: Props) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/work-items/${workItem.id}`);
+  };
+
   return (
-    <div className="rounded border p-4 shadow">
+    <div 
+      className="rounded border p-4 shadow cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={handleClick}
+    >
       {/* Header Section */}
       <div className="mb-3">
         <div className="flex items-center justify-between">

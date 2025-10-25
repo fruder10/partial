@@ -62,6 +62,43 @@ type WorkItemUpdate = {
 const prisma = new PrismaClient();
 
 /**
+ * Get single WorkItem by ID
+ */
+export const getWorkItemById = async (req: Request, res: Response): Promise<void> => {
+  const { workItemId } = req.params;
+
+  try {
+    const workItem = await prisma.workItem.findUnique({
+      where: { id: Number(workItemId) },
+      include: {
+        program: true,
+        dueByMilestone: true,
+        deliverableDetail: true,
+        issueDetail: true,
+        authorUser: true,
+        assigneeUser: true,
+        partNumbers: {
+          include: {
+            partNumber: true,
+          },
+        },
+        attachments: true,
+        comments: true,
+      },
+    });
+
+    if (!workItem) {
+      res.status(404).json({ message: "Work item not found" });
+      return;
+    }
+
+    res.json(workItem);
+  } catch (error: any) {
+    res.status(500).json({ message: `Error retrieving work item: ${error.message}` });
+  }
+};
+
+/**
  * Get WorkItems
  * Supports optional filtering by programId or partNumberId
  */

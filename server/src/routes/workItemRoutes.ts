@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getWorkItems,
+  getWorkItemById,
   getWorkItemsByUser,
   createWorkItem,
   updateWorkItemStatus,
@@ -15,6 +16,9 @@ router.get("/", getWorkItems);
 
 // ✅ GET all work items authored or assigned to a user
 router.get("/user/:userId", getWorkItemsByUser);
+
+// ✅ GET single work item by ID (must be last to avoid conflicts)
+router.get("/:workItemId", getWorkItemById);
 
 // ✅ CREATE a new work item (with DeliverableDetail or IssueDetail if applicable)
 router.post("/", createWorkItem);
