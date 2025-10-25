@@ -175,7 +175,7 @@ const HomePage = () => {
   const { data: teams, isLoading: isTeamsLoading } = useGetTeamsQuery();
 
   const [selectedWorkItemType, setSelectedWorkItemType] = useState<WorkItemType | "all">("all");
-  const [selectedPriority, setSelectedPriority] = useState<Priority | "all">(Priority.Urgent);
+  const [selectedPriority, setSelectedPriority] = useState<Priority | "all">("all");
   const [workItemFilter, setWorkItemFilter] = useState<"all" | "open">("all");
 
 
