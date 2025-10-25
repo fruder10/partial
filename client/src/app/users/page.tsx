@@ -8,6 +8,7 @@ import {
   GridColDef,
 } from "@mui/x-data-grid";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
 
 const columns: GridColDef[] = [
@@ -68,6 +69,11 @@ const columns: GridColDef[] = [
 const Users = () => {
   const { data: users, isLoading, isError } = useGetUsersQuery();
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const router = useRouter();
+
+  const handleRowClick = (params: any) => {
+    router.push(`/users/${params.row.userId}`);
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (isError || !users) return <div>Error fetching users</div>;
@@ -84,6 +90,7 @@ const Users = () => {
           showToolbar
           className={dataGridClassNames}
           sx={dataGridSxStyles(isDarkMode)}
+          onRowClick={handleRowClick}
         />
       </div>
     </div>

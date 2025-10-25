@@ -1,5 +1,6 @@
 import { User } from "@/state/api";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 type Props = {
@@ -7,8 +8,17 @@ type Props = {
 };
 
 const UserCard = ({ user }: Props) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/users/${user.userId}`);
+  };
+
   return (
-    <div className="rounded border p-4 shadow">
+    <div 
+      className="rounded border p-4 shadow cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={handleClick}
+    >
       <div className="flex items-center gap-3 mb-3">
         {user.profilePictureUrl ? (
           <Image

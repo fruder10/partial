@@ -1,4 +1,5 @@
 import { Program, useGetUsersQuery } from "@/state/api";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 type Props = {
@@ -6,6 +7,7 @@ type Props = {
 };
 
 const ProgramCard = ({ program }: Props) => {
+  const router = useRouter();
   const { data: users } = useGetUsersQuery();
   const programManager = users?.find((u) => u.userId === program.programManagerUserId);
 
@@ -17,8 +19,15 @@ const ProgramCard = ({ program }: Props) => {
     });
   };
 
+  const handleClick = () => {
+    router.push("/programs");
+  };
+
   return (
-    <div className="rounded border p-4 shadow">
+    <div 
+      className="rounded border p-4 shadow cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={handleClick}
+    >
       {/* Header Section */}
       <div className="mb-3">
         <h3 className="font-semibold text-lg">{program.name}</h3>

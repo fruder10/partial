@@ -18,6 +18,7 @@ import { useAppSelector } from "../redux";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Header from "@/components/Header";
 import BurndownChart from "@/components/BurndownChart";
+import { useRouter } from "next/navigation";
 import {
   Bar,
   BarChart,
@@ -168,6 +169,7 @@ const formatDate = (dateString: string) => {
 };
 
 const HomePage = () => {
+  const router = useRouter();
   const [selectedProgramId, setSelectedProgramId] = useState<number | "all">("all");
   const [chartMode, setChartMode] = useState<"type" | "priority">("type");
 
@@ -592,6 +594,7 @@ const HomePage = () => {
                   sortModel: [{ field: "dueDate", sort: "asc" }],
                 },
               }}
+              onRowClick={(params) => router.push(`/work-items/${params.row.id}`)}
             />
           </div>
         </div>

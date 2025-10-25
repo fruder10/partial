@@ -1,4 +1,5 @@
 import { Milestone, StatusLabels } from "@/state/api";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 type Props = {
@@ -6,6 +7,8 @@ type Props = {
 };
 
 const MilestoneCard = ({ milestone }: Props) => {
+  const router = useRouter();
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -28,8 +31,15 @@ const MilestoneCard = ({ milestone }: Props) => {
     }
   };
 
+  const handleClick = () => {
+    router.push("/programs");
+  };
+
   return (
-    <div className="rounded border p-4 shadow">
+    <div 
+      className="rounded border p-4 shadow cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={handleClick}
+    >
       {/* Header Section */}
       <div className="mb-3">
         <div className="flex items-center justify-between">

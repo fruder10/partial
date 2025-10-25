@@ -1,4 +1,5 @@
 import { PartNumber, PartStateLabels } from "@/state/api";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 type Props = {
@@ -6,8 +7,17 @@ type Props = {
 };
 
 const PartNumberCard = ({ partNumber }: Props) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/parts/${partNumber.id}`);
+  };
+
   return (
-    <div className="rounded border p-4 shadow">
+    <div 
+      className="rounded border p-4 shadow cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={handleClick}
+    >
       {/* Header Section */}
       <div className="mb-3">
         <div className="flex items-center justify-between">

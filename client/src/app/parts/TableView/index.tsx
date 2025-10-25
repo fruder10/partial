@@ -6,6 +6,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import ModalEditWorkItem from "@/components/ModalEditWorkItem";
 import { PlusSquare } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Props = {
   id: string;
@@ -266,6 +267,7 @@ const columns: GridColDef[] = [
 ];
 
 const TableView = ({ id, setIsModalNewWorkItemOpen, searchQuery }: Props) => {
+  const router = useRouter();
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const [workItemFilter, setWorkItemFilter] = React.useState<"all" | "open">("all");
   const [editingWorkItem, setEditingWorkItem] = React.useState<WorkItem | null>(null);
@@ -349,7 +351,7 @@ const TableView = ({ id, setIsModalNewWorkItemOpen, searchQuery }: Props) => {
         }}
         disableRowSelectionOnClick
         getRowId={(row) => row.id}
-        onRowClick={(params) => setEditingWorkItem(params.row)}
+        onRowClick={(params) => router.push(`/work-items/${params.row.id}`)}
       />
     </div>
   );

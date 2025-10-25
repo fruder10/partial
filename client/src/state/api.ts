@@ -260,6 +260,7 @@ export interface WorkItemToPartNumber {
   id: number;
   workItemId: number;
   partNumberId: number;
+  partNumber?: PartNumber;
 }
 
 export interface Attachment {
@@ -375,6 +376,11 @@ export const api = createApi({
                         { type: "WorkItems", id: "LIST" },
                     ]
                 : [{ type: "WorkItems", id: "LIST" }],
+    }),
+
+    getWorkItemById: build.query<WorkItem, number>({
+        query: (workItemId) => `workItems/${workItemId}`,
+        providesTags: (result, error, workItemId) => [{ type: "WorkItems", id: workItemId }],
     }),
 
     getWorkItemsByProgram: build.query<WorkItem[], { programId: number }>({
@@ -605,6 +611,11 @@ export const api = createApi({
       providesTags: ["Users"],
     }),
 
+    getUserById: build.query<User, number>({
+      query: (userId) => `users/${userId}`,
+      providesTags: (result, error, userId) => [{ type: "Users", id: userId }],
+    }),
+
     /* ---------- SEARCH ---------- */
     search: build.query<SearchResults, string>({
       query: (query) => `search?query=${query}`,
@@ -617,6 +628,7 @@ export const api = createApi({
 =================== */
 export const {
   useGetWorkItemsQuery,
+  useGetWorkItemByIdQuery,
   useGetWorkItemsByProgramQuery,
   useGetWorkItemsByPartNumberQuery,
   useGetWorkItemsByUserQuery,
@@ -646,6 +658,7 @@ export const {
   useEditTeamMutation,
 
   useGetUsersQuery,
+  useGetUserByIdQuery,
 
   useSearchQuery,
 } = api;
